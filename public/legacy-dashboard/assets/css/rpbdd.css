@@ -10546,7 +10546,8 @@ html[data-rpbdd-theme="night"] .rpbdd-app section[data-panel="events"] .rpbdd-ev
   box-shadow: none;
 }
 
-html[data-rpbdd-theme="night"] section[data-panel="events"] .rpbdd-events-month-bar {
+html[data-rpbdd-theme="night"] section[data-panel="events"] .rpbdd-events-month-bar,
+html[data-rpbdd-theme="night"] #modal-notifications #rpbdd-bday-modal-month-bar {
   background: rgba(2, 14, 40, 0.42);
   border-color: rgba(112, 184, 255, 0.28);
   backdrop-filter: blur(8px);
@@ -14091,5 +14092,47 @@ html[data-rpbdd-theme="light"] body.rpbdd-body .rpbdd-cal-cell .rpbdd-event-chip
   color: #fff5f5 !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Mobile layout hardening (phone widths): prevent overflow and keep containers aligned. */
+@media (max-width: 900px) {
+  .rpbdd-toolbar--team.is-logs-search .rpbdd-toolbar-actions,
+  .rpbdd-toolbar--team.is-logs-search.is-team-tm-toolbar .rpbdd-toolbar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .rpbdd-toolbar--team.is-logs-search .rpbdd-toolbar-team-actions-left,
+  .rpbdd-toolbar--team.is-logs-search .rpbdd-toolbar-team-actions-right,
+  .rpbdd-toolbar--team.is-logs-search .rpbdd-team-logs-search {
+    grid-column: 1;
+    justify-self: stretch;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .rpbdd-toolbar--team.is-logs-search .rpbdd-toolbar-team-actions-right {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .rpbdd-main,
+  .rpbdd-main-inner,
+  .rpbdd-panel,
+  .rpbdd-toolbar,
+  .rpbdd-toolbar-actions {
+    min-width: 0;
+  }
+
+  .rpbdd-modal,
+  .rpbdd-modal-body,
+  .rpbdd-modal-foot {
+    width: min(100%, calc(100vw - 1rem));
+  }
+
+  .rpbdd-main-header-trailing--branding {
+    display: none;
+  }
 }
 
