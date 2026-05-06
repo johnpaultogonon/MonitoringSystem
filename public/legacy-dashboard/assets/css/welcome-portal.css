@@ -1,0 +1,509 @@
+/**
+ * RPBDD welcome portal — professional layout, green-forward palette.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap");
+
+:root {
+  --wp-green-950: #052e16;
+  --wp-green-900: #14532d;
+  --wp-green-800: #166534;
+  --wp-green-700: #15803d;
+  --wp-green-600: #16a34a;
+  --wp-green-500: #22c55e;
+  --wp-green-400: #4ade80;
+  --wp-green-200: #bbf7d0;
+  --wp-green-100: #dcfce7;
+  --wp-green-50: #f0fdf4;
+  --wp-teal-800: #115e59;
+  --wp-teal-700: #0f766e;
+  --wp-teal-600: #0d9488;
+  --wp-page-green: #2d7a3f;
+  --wp-header-green: #134022;
+  --wp-body-tint: #f7faf8;
+  --wp-body-bg: #ffffff;
+  --wp-text-dark: #0f172a;
+  --wp-text-muted: #64748b;
+  --wp-card-radius: 20px;
+  --wp-btn-radius: 12px;
+  --wp-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --wp-font-display: "Lexend", var(--wp-font);
+  --wp-header-logo-size: clamp(4rem, 11.5vmin, 5.75rem);
+  /* Vertical padding around card; card height uses this so it fits the viewport */
+  --wp-shell-vpad: clamp(0.35rem, 1.5vmin, 0.75rem);
+  /* Extra bottom padding shifts the card a bit higher than dead-center */
+  --wp-shell-lift: clamp(0.65rem, 2.25vh, 1.65rem);
+  --wp-shadow-card: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+  --wp-shadow-btn: 0 2px 4px rgba(15, 23, 42, 0.06), 0 8px 20px -6px rgba(20, 83, 45, 0.35);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html:has(body.welcome-portal) {
+  height: 100%;
+  overflow: hidden;
+}
+
+body.welcome-portal {
+  margin: 0;
+  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  font-family: var(--wp-font);
+  color: var(--wp-text-dark);
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--wp-page-green);
+  background-image:
+    radial-gradient(ellipse 100% 80% at 50% -30%, rgba(255, 255, 255, 0.14), transparent 55%),
+    linear-gradient(165deg, var(--wp-green-800) 0%, var(--wp-page-green) 42%, var(--wp-green-900) 100%);
+}
+
+body.welcome-portal::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffffff' fill-opacity='0.035' d='M36 0L72 36 36 72 0 36z'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.welcome-portal__shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--wp-shell-vpad) clamp(0.75rem, 3vmin, 1.5rem)
+    calc(var(--wp-shell-vpad) + var(--wp-shell-lift));
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.welcome-portal__card {
+  width: 100%;
+  max-width: min(580px, calc(100vw - 1rem));
+  /* Full viewport minus top pad + (bottom pad + lift) */
+  min-height: calc(100vh - 2 * var(--wp-shell-vpad) - var(--wp-shell-lift) - 0.15rem);
+  min-height: calc(100dvh - 2 * var(--wp-shell-vpad) - var(--wp-shell-lift) - 0.15rem);
+  max-height: calc(100vh - 2 * var(--wp-shell-vpad) - var(--wp-shell-lift) - 0.15rem);
+  max-height: calc(100dvh - 2 * var(--wp-shell-vpad) - var(--wp-shell-lift) - 0.15rem);
+  border-radius: clamp(16px, 3.2vmin, var(--wp-card-radius));
+  overflow: hidden;
+  background: var(--wp-body-bg);
+  box-shadow: var(--wp-shadow-card);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 1;
+}
+
+@media (min-width: 900px) {
+  .welcome-portal__card {
+    max-width: min(640px, 50vw);
+  }
+}
+
+/* Header */
+.welcome-portal__header {
+  position: relative;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #16532f 0%, var(--wp-header-green) 48%, #0f331c 100%);
+  padding: clamp(1rem, 3vmin, 1.65rem) clamp(0.85rem, 2.6vmin, 1.5rem);
+  display: grid;
+  grid-template-columns: minmax(var(--wp-header-logo-size), 6rem) minmax(0, 1fr) minmax(var(--wp-header-logo-size), 6rem);
+  align-items: center;
+  justify-items: center;
+  gap: clamp(0.55rem, 2vmin, 1.15rem);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.welcome-portal__header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--wp-green-500) 20%, var(--wp-green-400) 50%, var(--wp-green-500) 80%, transparent);
+  opacity: 0.65;
+}
+
+@media (max-width: 520px) {
+  .welcome-portal__header {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .welcome-portal__titles {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    order: 0;
+    width: 100%;
+  }
+
+  .welcome-portal__logo--dar {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: end;
+    margin-right: 0.35rem;
+  }
+
+  .welcome-portal__logo--bp {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    margin-left: 0.35rem;
+  }
+}
+
+.welcome-portal__logo {
+  flex-shrink: 0;
+  display: block;
+  width: var(--wp-header-logo-size);
+  height: var(--wp-header-logo-size);
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.welcome-portal__logo--dar {
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+.welcome-portal__logo--bp {
+  border-radius: 0;
+}
+
+.welcome-portal__titles {
+  min-width: 0;
+  width: 100%;
+  justify-self: stretch;
+  text-align: center;
+  color: #fff;
+}
+
+.welcome-portal__title {
+  margin: 0;
+  font-family: var(--wp-font-display);
+  font-size: clamp(0.98rem, 2.55vmin, 1.3rem);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-portal__acronym {
+  margin: 0.28rem 0 0;
+  font-family: var(--wp-font-display);
+  font-size: clamp(1.15rem, 3.1vmin, 1.48rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wp-green-100);
+}
+
+/* Clearly larger than division + (RPBDD) */
+.welcome-portal__subtitle {
+  margin: 0.3rem 0 0;
+  font-family: var(--wp-font-display);
+  font-size: clamp(1.48rem, 4.85vmin, 2.12rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.98);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.28);
+}
+
+/* Body */
+.welcome-portal__body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--wp-body-tint) 0%, var(--wp-body-bg) 28%);
+  padding: clamp(2.05rem, 4.65vmin, 2.65rem) clamp(1.15rem, 3.2vmin, 1.75rem) clamp(1.25rem, 3.4vmin, 1.85rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.welcome-portal__eyebrow {
+  margin: 0 0 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.welcome-portal__heading {
+  margin: 0;
+  font-family: var(--wp-font-display);
+  font-size: clamp(1.32rem, 4vmin, 1.65rem);
+  font-weight: 700;
+  color: var(--wp-text-dark);
+  letter-spacing: -0.03em;
+  line-height: 1.18;
+}
+
+.welcome-portal__hint {
+  margin: 0.42rem auto 0;
+  font-size: clamp(0.875rem, 2.35vmin, 0.95rem);
+  font-weight: 400;
+  color: var(--wp-text-muted);
+  line-height: 1.45;
+  max-width: 30rem;
+}
+
+.welcome-portal__divider {
+  margin: clamp(1.9rem, 4.65vmin, 2.5rem) auto 0;
+  max-width: 13rem;
+  height: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, var(--wp-green-200) 15%, var(--wp-green-600) 50%, var(--wp-green-200) 85%, transparent);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.welcome-portal__actions {
+  margin-top: clamp(1.85rem, 4.55vmin, 2.35rem);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(0.65rem, 2.1vmin, 1.15rem);
+  flex-shrink: 0;
+}
+
+.welcome-portal__btn {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: clamp(1.22rem, 3.35vmin, 1.65rem) 1rem;
+  padding-top: clamp(2.1rem, 5.5vmin, 2.65rem);
+  border-radius: clamp(10px, 2vmin, var(--wp-btn-radius));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  text-decoration: none;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  box-shadow: var(--wp-shadow-btn);
+  min-height: clamp(10.35rem, 45.5dvh, 14.1rem);
+}
+
+/* Admin Only / Leader Only / General Access — centered top */
+.welcome-portal__btn-badge {
+  position: absolute;
+  top: 0.65rem;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  z-index: 1;
+  padding: 0.16rem 0.48rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  color: rgba(255, 255, 255, 0.94);
+  white-space: nowrap;
+  max-width: calc(100% - 1.25rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 380px) {
+  .welcome-portal__actions {
+    flex-direction: column;
+  }
+
+  .welcome-portal__btn {
+    min-height: clamp(8.2rem, 33dvh, 9.95rem);
+    flex-direction: row;
+    gap: 0.65rem;
+    justify-content: center;
+    padding-top: clamp(1.85rem, 4.5vmin, 2.35rem);
+  }
+
+  .welcome-portal__btn-badge {
+    top: 0.5rem;
+    font-size: 0.58rem;
+  }
+}
+
+.welcome-portal__btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+}
+
+.welcome-portal__btn:focus-visible {
+  outline: 2px solid var(--wp-green-500);
+  outline-offset: 3px;
+}
+
+/* Distinct card design per access level (tied to data-welcome-cta). */
+.welcome-portal__btn[data-welcome-cta="admin"] {
+  background: linear-gradient(145deg, var(--wp-teal-600) 0%, var(--wp-teal-700) 50%, var(--wp-teal-800) 100%);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06), 0 8px 20px -6px rgba(15, 118, 110, 0.4);
+}
+
+.welcome-portal__btn[data-welcome-cta="admin"]:hover {
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.08), 0 14px 28px -8px rgba(15, 118, 110, 0.48);
+}
+
+.welcome-portal__btn[data-welcome-cta="admin"]:focus-visible {
+  outline-color: var(--wp-teal-600);
+}
+
+.welcome-portal__btn[data-welcome-cta="team-leader"] {
+  background: linear-gradient(145deg, #4f46e5 0%, #4338ca 55%, #312e81 100%);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06), 0 8px 20px -6px rgba(67, 56, 202, 0.42);
+}
+
+.welcome-portal__btn[data-welcome-cta="team-leader"]:hover {
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.08), 0 14px 28px -8px rgba(67, 56, 202, 0.5);
+}
+
+.welcome-portal__btn[data-welcome-cta="team-leader"]:focus-visible {
+  outline-color: #6366f1;
+}
+
+.welcome-portal__btn[data-welcome-cta="member"],
+.welcome-portal__btn[data-welcome-cta="user"] {
+  background: linear-gradient(145deg, var(--wp-green-800) 0%, var(--wp-green-900) 55%, var(--wp-green-950) 100%);
+  box-shadow: var(--wp-shadow-btn);
+}
+
+.welcome-portal__btn[data-welcome-cta="member"]:hover,
+.welcome-portal__btn[data-welcome-cta="user"]:hover {
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.08), 0 14px 28px -8px rgba(20, 83, 45, 0.45);
+}
+
+.welcome-portal__btn[data-welcome-cta="member"]:focus-visible,
+.welcome-portal__btn[data-welcome-cta="user"]:focus-visible {
+  outline-color: var(--wp-green-400);
+}
+
+.welcome-portal__btn-icon {
+  width: clamp(3.2rem, 9.8vmin, 3.9rem);
+  height: clamp(3.2rem, 9.8vmin, 3.9rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+}
+
+.welcome-portal__btn-icon svg {
+  width: 1.78rem;
+  height: 1.78rem;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.welcome-portal__btn-title {
+  margin: 0;
+  font-family: var(--wp-font-display);
+  font-size: clamp(1.12rem, 3.05vmin, 1.3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.welcome-portal__btn-sub {
+  margin: 0;
+  font-size: clamp(0.82rem, 2.15vmin, 0.96rem);
+  font-weight: 500;
+  opacity: 0.92;
+  line-height: 1.3;
+}
+
+/* Extra-tight vertical space (small laptops / landscape phones) */
+@media (max-height: 520px) {
+  .welcome-portal__header {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .welcome-portal__acronym {
+    margin-top: 0.15rem;
+  }
+
+  .welcome-portal__subtitle {
+    margin-top: 0.25rem;
+    font-size: clamp(0.95rem, 3vmin, 1.15rem);
+  }
+
+  .welcome-portal__body {
+    padding: 1.45rem 0.85rem 0.6rem;
+  }
+
+  .welcome-portal__divider {
+    margin-top: 1.05rem;
+  }
+
+  .welcome-portal__actions {
+    margin-top: 1.05rem;
+  }
+
+  .welcome-portal__btn {
+    min-height: 6.85rem;
+    padding: 0.62rem 0.55rem;
+    padding-top: 1.75rem;
+    gap: 0.38rem;
+  }
+
+  .welcome-portal__btn-badge {
+    top: 0.4rem;
+  }
+}
+
+/* Portal notices (e.g. sign-in required, logout confirmation) */
+.welcome-portal__flash {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--wp-btn-radius);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.welcome-portal__flash--error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.welcome-portal__flash--success {
+  background: var(--wp-green-50);
+  border: 1px solid var(--wp-green-200);
+  color: var(--wp-green-900);
+}

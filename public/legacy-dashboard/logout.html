@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logged Out</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    .card {
+      width: min(520px, calc(100% - 2rem));
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      text-align: center;
+    }
+    h1 { margin: 0 0 0.4rem; font-size: 1.2rem; }
+    p { margin: 0 0 0.9rem; color: #475569; }
+    a {
+      display: inline-block;
+      text-decoration: none;
+      background: #166534;
+      color: #fff;
+      border-radius: 10px;
+      padding: 0.5rem 0.8rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>You have been logged out.</h1>
+    <p>Your local dashboard session and saved state were cleared.</p>
+    <a href="./login-portal.html">Go to Login Portal</a>
+  </main>
+  <script>
+    (function () {
+      var keys = [
+        'rpbdd_events',
+        'rpbdd_deleted_events',
+        'rpbdd_teams',
+        'rpbdd_teams_recycle_local',
+        'rpbdd_members_recycle_local',
+        'rpbdd_members',
+        'rpbdd_profile_notifications',
+        'rpbdd_profile_notif_recycle',
+        'rpbdd_profile_notif_purged_servers',
+        'rpbdd_dd_section_team',
+        'rpbdd_dd_position',
+      ];
+      try {
+        for (var i = 0; i < keys.length; i++) localStorage.removeItem(keys[i]);
+      } catch (e) {}
+      try {
+        sessionStorage.clear();
+      } catch (e2) {}
+      setTimeout(function () {
+        window.location.replace('./login-portal.html');
+      }, 400);
+    })();
+  </script>
+</body>
+</html>

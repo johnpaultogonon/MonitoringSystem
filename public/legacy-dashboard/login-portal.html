@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RPBDD Portal - Welcome</title>
+  <link rel="stylesheet" href="./assets/css/welcome-portal.css" />
+</head>
+<body class="welcome-portal">
+  <div class="welcome-portal__shell">
+    <div class="welcome-portal__card">
+      <header class="welcome-portal__header">
+        <img
+          class="welcome-portal__logo welcome-portal__logo--dar"
+          src="./assets/images/branding/dar-northern-mindanao-seal.png"
+          width="104"
+          height="104"
+          alt="Department of Agrarian Reform - Northern Mindanao"
+        />
+        <div class="welcome-portal__titles">
+          <p class="welcome-portal__title">REGIONAL PROGRAM BENEFICIARIES<br />DEVELOPMENT DIVISION</p>
+          <p class="welcome-portal__acronym">(RPBDD)</p>
+          <p class="welcome-portal__subtitle">MONITORING SYSTEM</p>
+        </div>
+        <img
+          class="welcome-portal__logo welcome-portal__logo--bp"
+          src="./assets/images/branding/bagong-pilipinas-logo.png"
+          width="104"
+          height="104"
+          alt="Bagong Pilipinas"
+        />
+      </header>
+      <div class="welcome-portal__body">
+        <p class="welcome-portal__eyebrow">Official monitoring portal</p>
+        <h1 class="welcome-portal__heading">Welcome to RPBDD Portal</h1>
+        <p class="welcome-portal__hint">Please select your access level to continue</p>
+        <div class="welcome-portal__divider" aria-hidden="true"></div>
+        <div class="welcome-portal__actions">
+          <a href="./index.html" class="welcome-portal__btn" data-welcome-cta="member">
+            <span class="welcome-portal__btn-badge">Portal Access</span>
+            <span class="welcome-portal__btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 3l6.5 2.7v5.1c0 4.3-2.6 7.6-6.5 9.2-3.9-1.6-6.5-4.9-6.5-9.2V5.7L12 3z" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"></path>
+                <path d="M12 8.3v7.7" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"></path>
+              </svg>
+            </span>
+            <span class="welcome-portal__btn-title">RPBDD Access</span>
+            <span class="welcome-portal__btn-sub">Open Monitoring Portal</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var keys = [
+        'rpbdd_events',
+        'rpbdd_deleted_events',
+        'rpbdd_teams',
+        'rpbdd_teams_recycle_local',
+        'rpbdd_members_recycle_local',
+        'rpbdd_members',
+        'rpbdd_profile_notifications',
+        'rpbdd_profile_notif_recycle',
+        'rpbdd_profile_notif_purged_servers',
+      ];
+      try {
+        for (var i = 0; i < keys.length; i++) localStorage.removeItem(keys[i]);
+      } catch (e) {}
+      try {
+        sessionStorage.clear();
+      } catch (e2) {}
+    })();
+  </script>
+</body>
+</html>

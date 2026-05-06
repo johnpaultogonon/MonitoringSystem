@@ -1,0 +1,479 @@
+.welcome-root {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  background-color: #2d7a3f;
+  background-image:
+    radial-gradient(ellipse 100% 80% at 50% -30%, rgba(255, 255, 255, 0.14), transparent 55%),
+    linear-gradient(165deg, #166534 0%, #2d7a3f 42%, #14532d 100%);
+}
+
+.welcome-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffffff' fill-opacity='0.035' d='M36 0L72 36 36 72 0 36z'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.welcome-root > * {
+  position: relative;
+  z-index: 1;
+}
+
+.portalCard {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  width: min(620px, 100%);
+  background: #f8fafc;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+}
+
+.authPortalCard {
+  width: min(430px, 100%);
+  min-height: 430px;
+  border-radius: 16px;
+  overflow: hidden;
+  display: block;
+}
+
+.portalHeader {
+  background: linear-gradient(165deg, #166534, #14532d);
+  color: #fff;
+  padding: 0.95rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.headerText { text-align: center; text-transform: uppercase; }
+.headerText p { margin: 0; font-size: 0.8rem; letter-spacing: 0.07em; font-weight: 600; line-height: 1.25; }
+.headerText h1 {
+  margin: 0.24rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.92rem;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  line-height: 1.06;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.headerLogoDar { width: 66px; height: 66px; object-fit: contain; border-radius: 999px; background: #fff; padding: 0.15rem; }
+.headerLogoBagong { width: 88px; height: auto; object-fit: contain; }
+
+.portalBody { padding: 1.65rem 1.35rem 1.55rem; text-align: center; }
+.kicker { margin: 0; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.69rem; color: #475569; font-weight: 700; }
+.portalBody h2 {
+  margin: 0.35rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.08rem;
+  color: #111827;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+}
+.portalSub { margin: 0.4rem 0 0; color: #64748b; font-size: 0.95rem; }
+
+.accessGrid { margin-top: 1.1rem; display: grid; grid-template-columns: minmax(220px, 270px); justify-content: center; }
+.accessCard {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  color: #fff;
+  min-height: 260px;
+  padding: 0.75rem 0.68rem;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.accessCard:hover { transform: translateY(-2px); box-shadow: 0 14px 24px rgba(15, 23, 42, 0.3); filter: brightness(1.03); }
+.accessCard:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+.accessBadge { text-transform: uppercase; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.09em; background: rgba(255, 255, 255, 0.18); padding: 0.2rem 0.45rem; border-radius: 999px; }
+.accessIcon { margin-top: 0.2rem; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-size: 1.3rem; background: rgba(255, 255, 255, 0.17); }
+.adminCard { background: linear-gradient(180deg, #15803d, #166534); }
+
+.authPanel {
+  background: #f8fafc;
+  display: block;
+}
+
+.authPanelHeader {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 55%),
+    linear-gradient(160deg, #1a7a43, #14532d);
+  color: #fff;
+  padding: 0.78rem 0.92rem 0.82rem;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 0.28rem;
+  position: relative;
+}
+
+.authBack {
+  position: absolute;
+  top: 0.66rem;
+  left: 0.66rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.authPortalLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 0.62rem;
+  font-weight: 700;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.authLockIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  display: grid;
+  place-items: center;
+  color: #dcfce7;
+}
+
+.authPanelHeader h2 {
+  margin: 0.1rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.54rem;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.authAccessLabel {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  color: #dcfce7;
+  font-weight: 600;
+}
+
+.authPanelBody {
+  padding: 1.45rem 0.92rem 0.92rem;
+  display: grid;
+  gap: 0.7rem;
+  background: #f8fafc;
+}
+
+.authPanelBody label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1f2937;
+  display: grid;
+  gap: 0.42rem;
+}
+
+.noticeText,
+.hint {
+  margin: 0;
+  font-size: 0.86rem;
+  color: #475569;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  padding: 0.52rem 0.6rem;
+}
+
+.errorText {
+  margin: 0;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.52rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.authErrorText {
+  margin: 0;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.5rem 0.62rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.fieldWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #d2dbe0;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 2rem 0 0.46rem;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.fieldIcon {
+  display: grid;
+  place-items: center;
+  opacity: 0.65;
+  color: #64748b;
+}
+
+.fieldWrap input {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0.52rem 0.2rem;
+  font-size: 0.89rem;
+  width: 100%;
+  color: #0f172a;
+}
+
+.toggleVisibility {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #64748b;
+  padding: 0;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.toggleVisibility:focus-visible {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.fieldWrap:focus-within {
+  border-color: #15803d;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+}
+
+.fieldWrap input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.fieldWrap input:-webkit-autofill,
+.fieldWrap input:-webkit-autofill:hover,
+.fieldWrap input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: #0f172a;
+  caret-color: #0f172a;
+}
+
+.loginActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 0.2rem;
+}
+
+.loginActions button {
+  border: 1px solid #166534;
+  border-radius: 8px;
+  background: #166534;
+  color: #fff;
+  padding: 0.52rem 0.7rem;
+  cursor: pointer;
+}
+
+.loginActions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.loginActions .ghostBtn {
+  border-color: #cbd5e1;
+  background: #fff;
+  color: #334155;
+}
+
+.authPanelBody > button[type="submit"] {
+  margin-top: 0.14rem;
+  background: linear-gradient(180deg, #15803d, #166534);
+  border-color: #166534;
+  border-radius: 10px;
+  padding: 0.6rem 0.78rem;
+  font-size: 0.94rem;
+  color: #fff;
+  border: 1px solid #166534;
+  cursor: pointer;
+  transition: filter 0.16s ease, transform 0.16s ease;
+}
+
+.authPanelBody > button[type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+
+.authPanelBody > button[type="submit"]:focus-visible,
+.authBack:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+}
+
+.legacy-system-root {
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.legacy-system-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: #ffffff;
+}
+
+.legacy-system-error {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  margin: 0;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 900px) {
+  .portalCard {
+    width: min(620px, calc(100vw - 1.15rem));
+  }
+
+  .portalHeader {
+    padding: 0.82rem 0.92rem;
+    gap: 0.6rem;
+  }
+
+  .headerLogoDar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .headerLogoBagong {
+    width: 76px;
+  }
+
+  .headerText h1 {
+    font-size: 1.62rem;
+    letter-spacing: 0.06em;
+  }
+
+  .portalBody h2 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .welcome-root {
+    padding: 0.8rem;
+  }
+
+  .portalCard {
+    border-radius: 14px;
+  }
+
+  .portalHeader {
+    padding: 0.72rem 0.75rem;
+    gap: 0.45rem;
+  }
+
+  .headerText p {
+    font-size: 0.66rem;
+  }
+
+  .headerText h1 {
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+  }
+
+  .headerLogoDar {
+    width: 46px;
+    height: 46px;
+  }
+
+  .headerLogoBagong {
+    width: 62px;
+  }
+
+  .portalBody {
+    padding: 1.15rem 0.78rem 1rem;
+  }
+
+  .portalBody h2 {
+    font-size: 1.46rem;
+  }
+
+  .portalSub {
+    font-size: 0.88rem;
+  }
+
+  .accessGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .accessCard {
+    min-height: 208px;
+    padding: 0.7rem 0.58rem;
+  }
+
+  .authPortalCard {
+    min-height: 410px;
+  }
+
+  .authPanelHeader {
+    padding: 0.72rem 0.74rem 0.74rem;
+  }
+
+  .authPanelHeader h2 {
+    font-size: 1.36rem;
+  }
+
+  .authPanelBody {
+    padding: 1.08rem 0.72rem 0.74rem;
+    gap: 0.62rem;
+  }
+
+  .fieldWrap {
+    padding-right: 1.9rem;
+  }
+
+}

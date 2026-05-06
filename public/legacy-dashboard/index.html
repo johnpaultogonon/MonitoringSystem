@@ -1,0 +1,1195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <script>
+    (function () {
+      function normalizeTheme(raw) {
+        var s = String(raw || '').trim().toLowerCase();
+        if (s === 'dark' || s === 'night') return 'night';
+        return 'light';
+      }
+      try {
+        var k = 'rpbdd_theme';
+        var kSidebar = 'rpbdd-sidebar-collapsed';
+        var kDensity = 'rpbdd_density';
+        var s = '';
+        var sSidebar = '';
+        var sDensity = '';
+        try {
+          s = localStorage.getItem(k) || '';
+          sSidebar = localStorage.getItem(kSidebar) || '';
+          sDensity = localStorage.getItem(kDensity) || '';
+        } catch (e0) {
+          s = '';
+          sSidebar = '';
+          sDensity = '';
+        }
+        var t = '';
+        var sidebarCollapsed = sSidebar === '1';
+        var density = sDensity === 'comfortable' ? 'comfortable' : 'compact';
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open(
+            'GET',
+            'https://wrwjbcpbsxnxnjqohros.supabase.co/rest/v1/dashboard_shared_settings?id=eq.1&select=theme,sidebar_collapsed,density',
+            false,
+          );
+          xhr.setRequestHeader('apikey', 'sb_publishable_-YxcXVQc0efHWo8NHKepjw_aNhv-e-V');
+          xhr.setRequestHeader('Authorization', 'Bearer sb_publishable_-YxcXVQc0efHWo8NHKepjw_aNhv-e-V');
+          xhr.setRequestHeader('Accept', 'application/json');
+          xhr.send(null);
+          if (xhr.status >= 200 && xhr.status < 300) {
+            var arr = JSON.parse(xhr.responseText || '[]');
+            if (Array.isArray(arr) && arr[0] && arr[0].theme != null) {
+              t = normalizeTheme(arr[0].theme);
+            }
+            if (Array.isArray(arr) && arr[0] && arr[0].sidebar_collapsed != null) {
+              sidebarCollapsed = !!arr[0].sidebar_collapsed;
+            }
+            if (Array.isArray(arr) && arr[0] && arr[0].density != null) {
+              density = String(arr[0].density).trim().toLowerCase() === 'comfortable' ? 'comfortable' : 'compact';
+            }
+          }
+        } catch (e1) {
+          /* ignore sync fetch failure, fall back below */
+        }
+        if (!t) {
+          var prefersDark =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          t = s === 'light' || s === 'night' || s === 'dark' ? normalizeTheme(s) : prefersDark ? 'night' : 'light';
+        }
+        document.documentElement.setAttribute('data-rpbdd-theme', t);
+        document.documentElement.setAttribute('data-rpbdd-density', density);
+        try {
+          localStorage.setItem(k, t);
+          localStorage.setItem(kSidebar, sidebarCollapsed ? '1' : '0');
+          localStorage.setItem(kDensity, density);
+        } catch (e2) {
+          /* ignore */
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-rpbdd-theme', 'light');
+      }
+    })();
+    </script>
+    <title>RPBDD Dashboard</title>
+    <script>
+    window.addEventListener('pageshow', function (ev) {
+      if (ev.persisted) {
+        window.location.reload();
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="./assets/css/rpbdd.css">
+    <script type="application/json" id="rpbdd-user-json">{"name":"RPBDD User","email":"monitoring@rpbdd.gov.ph","photo":null,"role":"admin","sectionTeam":"","team":"","sessionLoginYmd":""}</script>
+    <script type="application/json" id="rpbdd-app-config">{"eventsApi":"/supabase-events-api","teamsApi":"/supabase-teams-api","membersApi":"/supabase-members-api","birthdaysApi":"/supabase-birthdays-api","profileNotificationsApi":"/supabase-profile-notifications-api","userLogsApi":"/supabase-user-logs-api","teamExportPdf":"/supabase-team-export/pdf","teamExportPrint":"/supabase-team-export/print","tasksApi":"/supabase-tasks-api","adminAccountApi":"/supabase-admin-account-api","logoutUrl":"/?logout=1","logoutBeaconUrl":"","sessionIdleMs":36000000}</script>
+</head>
+<body class="rpbdd-body rpbdd-portal-admin">
+<div class="rpbdd-app" id="rpbdd-app">
+        <div class="rpbdd-sidebar-profile rpbdd-sidebar-chrome">
+            <button type="button" class="rpbdd-sidebar-toggle" id="rpbdd-sidebar-toggle" title="Collapse sidebar" aria-controls="rpbdd-sidebar" aria-expanded="true">
+                <svg class="rpbdd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="rpbdd-sidebar-meta">
+                <button type="button" class="rpbdd-avatar" id="rpbdd-open-account" title="Account">
+                    <img id="rpbdd-avatar-img" alt="" style="display:none">
+                    <span id="rpbdd-user-initials">U</span>
+                </button>
+                <div class="rpbdd-sidebar-text">
+                    <p id="rpbdd-sidebar-name">User</p>
+                    <small id="rpbdd-sidebar-email">email</small>
+                    <small class="rpbdd-portal-badge">Admin Control Center</small>
+                </div>
+            </div>
+        </div>
+
+    <header class="rpbdd-main-header" id="rpbdd-main-header">
+            <div class="rpbdd-main-header-leading">
+                <div class="rpbdd-header-icon-badge" id="rpbdd-header-module-icon-wrap" aria-hidden="true">
+                    <svg class="rpbdd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                </div>
+                <h1 id="rpbdd-page-title">Dashboard</h1>
+            </div>
+            <div class="rpbdd-main-header-search-slot">
+                <!-- Events search moved into Events panel toolbar area -->
+            </div>
+            <div class="rpbdd-main-header-trailing">
+                <label class="rpbdd-theme-picker">
+                    <span class="rpbdd-theme-picker__text">Theme</span>
+                    <select id="rpbdd-theme-select" class="rpbdd-theme-select" title="Dashboard color theme" aria-label="Dashboard color theme">
+                        <option value="light">Light</option>
+                        <option value="night">Night sky</option>
+                    </select>
+                </label>
+                <div class="rpbdd-main-header-trailing--branding" aria-label="Government branding">
+                <img
+                    src="./assets/images/branding/dar-northern-mindanao-seal.png"
+                    alt="Department of Agrarian Reform - Northern Mindanao"
+                    class="rpbdd-header-brand-img rpbdd-header-brand-img--seal"
+                    width="72"
+                    height="72"
+                    loading="lazy"
+                    decoding="async"
+                >
+                <img
+                    src="./assets/images/branding/bagong-pilipinas-logo.png"
+                    alt="Bagong Pilipinas"
+                    class="rpbdd-header-brand-img rpbdd-header-brand-img--bp"
+                    width="210"
+                    height="74"
+                    loading="lazy"
+                    decoding="async"
+                >
+                </div>
+            </div>
+    </header>
+
+        <aside class="rpbdd-sidebar rpbdd-sidebar-chrome" id="rpbdd-sidebar" aria-label="Main navigation">
+            <nav class="rpbdd-nav">
+                <ul>
+                    <li><button type="button" data-nav="dashboard" class="is-active"><svg class="rpbdd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>Dashboard</span></button></li>
+                    <li><button type="button" data-nav="events"><svg class="rpbdd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>Events</span></button></li>
+                    <li><button type="button" data-nav="reports"><svg class="rpbdd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Reports</span></button></li>
+                </ul>
+            </nav>
+            <div class="rpbdd-sidebar-foot">
+                <a href="/?logout=1" class="rpbdd-btn-logout">
+                    <svg class="rpbdd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+    <div class="rpbdd-main">
+        <div class="rpbdd-main-inner">
+            <section class="rpbdd-panel is-visible" data-panel="dashboard">
+                <div class="rpbdd-dash">
+                    <div class="rpbdd-cal-wrap">
+                        <div class="rpbdd-cal-head">
+                            <div>
+                                <h2 class="rpbdd-cal-title" id="rpbdd-cal-month-label">Month</h2>
+                                <p class="rpbdd-cal-hint">Click on any day to view events.</p>
+                            </div>
+                            <div class="rpbdd-cal-nav">
+                                <button type="button" id="rpbdd-btn-prev-month" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                                <button type="button" id="rpbdd-btn-next-month" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </div>
+                        </div>
+                        <div class="rpbdd-legend" id="rpbdd-category-legend"></div>
+                        <div class="rpbdd-cal-grid-wrap" id="rpbdd-cal-grid-wrap">
+                            <div class="rpbdd-cal-dow">
+                                <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+                            </div>
+                            <div class="rpbdd-cal-cells" id="rpbdd-cal-cells"></div>
+                        </div>
+                    </div>
+                    <div class="rpbdd-side-col">
+                        <div class="rpbdd-widget rpbdd-widget--green">
+                            <div class="rpbdd-widget-head rpbdd-widget-head--month-events">
+                                <div class="rpbdd-widget-title-with-icon">
+                                    <span class="rpbdd-month-cal-icon" aria-hidden="true">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    </span>
+                                    <h3>Events this Month</h3>
+                                </div>
+                                <span id="rpbdd-upcoming-count" class="rpbdd-widget-badge rpbdd-widget-badge--green">0</span>
+                            </div>
+                            <p id="rpbdd-month-events-hint" class="rpbdd-month-events-hint" hidden></p>
+                            <div id="rpbdd-upcoming-list" class="rpbdd-widget-body rpbdd-widget-body--scroll rpbdd-widget-body--month-events"></div>
+                            <button type="button" class="rpbdd-btn-sm rpbdd-month-view-all" id="rpbdd-view-all-events">View All Events -></button>
+                        </div>
+                        <div class="rpbdd-widget rpbdd-widget--notifications rpbdd-widget--birthdays">
+                            <div class="rpbdd-widget-head rpbdd-widget-head--notifications">
+                                <div class="rpbdd-widget-title-with-icon">
+                                    <span class="rpbdd-notif-bell" aria-hidden="true">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7v6a8 8 0 1 1-16 0V7"/><path d="M3 7h18"/><path d="M12 3v4"/></svg>
+                                    </span>
+                                    <h3>Birthday Celebrants</h3>
+                                </div>
+                                <span class="rpbdd-widget-badge" id="rpbdd-notif-badge">0</span>
+                            </div>
+                            <div id="rpbdd-notif-preview-list" class="rpbdd-placeholder rpbdd-placeholder--dashed">No birthday celebrants yet</div>
+                            <button type="button" class="rpbdd-btn-sm rpbdd-notif-view-all" id="rpbdd-open-notifications">View all birthday celebrants -></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rpbdd-panel" data-panel="events">
+                <div class="rpbdd-card-flat rpbdd-card-flat--tall rpbdd-events-panel-layout">
+                    <div class="rpbdd-toolbar rpbdd-toolbar--events">
+                        <div class="rpbdd-pill-group">
+                            <button type="button" class="rpbdd-pill is-active" data-events-view="upcoming">Upcoming (<span id="rpbdd-count-upcoming">0</span>)</button>
+                            <button type="button" class="rpbdd-pill" data-events-view="done">Done (<span id="rpbdd-count-done">0</span>)</button>
+                        </div>
+                        <div class="rpbdd-events-inline-search" id="rpbdd-events-header-search-wrap">
+                            <div class="rpbdd-events-header-search">
+                                <label class="rpbdd-sr-only" for="rpbdd-events-search">Search by first word of event title</label>
+                                <div class="rpbdd-events-search-field">
+                                    <span class="rpbdd-events-search-icon" aria-hidden="true">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                                    </span>
+                                    <input type="search" class="rpbdd-events-search-input" id="rpbdd-events-search" name="events_search" placeholder="First word of title…" autocomplete="off" enterkeyhint="search" />
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-open-add-event">+ Add Event</button>
+                    </div>
+                    <div class="rpbdd-events-month-bar">
+                        <h3 class="rpbdd-events-month-title" id="rpbdd-events-month-label">Month</h3>
+                        <div class="rpbdd-events-month-nav">
+                            <button type="button" class="rpbdd-events-month-btn" id="rpbdd-events-prev-month" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                            <button type="button" class="rpbdd-events-month-btn" id="rpbdd-events-next-month" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+                        </div>
+                    </div>
+                    <div id="rpbdd-events-list" class="rpbdd-events-list-fill"></div>
+                    <div class="rpbdd-events-pagination-wrap">
+                        <div class="rpbdd-events-pagination-bar">
+                            <div class="rpbdd-events-pagination" id="rpbdd-events-pagination" hidden></div>
+                            <div class="rpbdd-events-bar rpbdd-events-recycle-anchor" id="rpbdd-events-recycle-bar" hidden>
+                                <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--recycle" id="rpbdd-open-recycle">
+                                    <svg class="rpbdd-btn-sm__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.83 1.83 0 0 1-.269-1.528l1.494-5.23a2 2 0 0 1 1.563-1.563l5.23-1.494a2 2 0 0 1 2.225 1.088l.522 1.042"/><path d="M14 14l2 6 6-4-6-4-2 6z"/><path d="M14 6l2-6 6 4-6 4-2-6z"/></svg>
+                                    <span>Recycle Bin</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rpbdd-panel" data-panel="reports">
+                <div class="rpbdd-card-flat rpbdd-card-flat--tall rpbdd-events-panel-layout">
+                    <div class="rpbdd-toolbar rpbdd-toolbar--reports">
+                        <p class="rpbdd-reports-toolbar-hint">One card per calendar legend category · Upcoming and Done match the Events panel rules</p>
+                    </div>
+                    <div id="rpbdd-reports-list" class="rpbdd-events-list-fill"></div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="rpbdd-footer-bar">
+            <div class="rpbdd-footer-email">
+                <a href="mailto:rpbdd2021arbdsp@gmail.com">rpbdd2021arbdsp@gmail.com</a>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-report-card-detail">
+    <div class="rpbdd-modal rpbdd-modal--lg rpbdd-modal--report-card">
+        <div class="rpbdd-modal-head rpbdd-modal-head--report-card">
+            <h2 id="rpbdd-report-card-modal-title">Report Details</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-report-card-detail" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body rpbdd-modal-body--report-card">
+            <div class="rpbdd-report-card-modal-kicker" id="rpbdd-report-card-modal-section">-</div>
+            <div id="rpbdd-report-card-modal-folder-meta" class="rpbdd-report-card-modal-folder-meta" hidden>
+                <div class="rpbdd-report-card-modal-folder-row">
+                    <span class="rpbdd-report-card-modal-folder-label">Section</span>
+                    <span class="rpbdd-report-card-modal-folder-value" id="rpbdd-report-card-modal-folder-section">—</span>
+                </div>
+                <div class="rpbdd-report-card-modal-folder-row">
+                    <span class="rpbdd-report-card-modal-folder-label">Position</span>
+                    <span class="rpbdd-report-card-modal-folder-value" id="rpbdd-report-card-modal-folder-position">—</span>
+                </div>
+            </div>
+            <div class="rpbdd-report-card-modal-main">
+                <div class="rpbdd-report-card-modal-identity">
+                    <div class="rpbdd-report-card-modal-name" id="rpbdd-report-card-modal-name">-</div>
+                    <div class="rpbdd-report-card-modal-team" id="rpbdd-report-card-modal-team">-</div>
+                </div>
+                <div class="rpbdd-report-card-modal-avatar" id="rpbdd-report-card-modal-avatar">-</div>
+            </div>
+            <div class="rpbdd-report-card-modal-grid">
+                <div class="rpbdd-report-card-modal-item">
+                    <div class="rpbdd-report-card-modal-label">Position</div>
+                    <div class="rpbdd-report-card-modal-value" id="rpbdd-report-card-modal-role">-</div>
+                </div>
+                <div class="rpbdd-report-card-modal-item">
+                    <div class="rpbdd-report-card-modal-label">Done tasks</div>
+                    <div class="rpbdd-report-card-modal-value" id="rpbdd-report-card-modal-meta">-</div>
+                </div>
+            </div>
+            <div class="rpbdd-report-card-modal-tasks">
+                <div class="rpbdd-report-card-modal-label">Completed Tasks (Done)</div>
+                <div id="rpbdd-report-card-modal-done-tasks" class="rpbdd-report-card-modal-done-list">Loading...</div>
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--neutral" data-close-modal="modal-report-card-detail">Close</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-report-category-display">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head">
+            <h2>Category display</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-report-category-display" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body rpbdd-report-cat-display-body">
+            <input type="hidden" id="rpbdd-report-cat-display-key" value="" />
+            <p class="rpbdd-report-cat-display-hint">Photo, section, name, and position are saved on this device only.</p>
+            <div class="rpbdd-report-cat-display-field">
+                <label for="rpbdd-report-cat-display-section">Section</label>
+                <input type="text" id="rpbdd-report-cat-display-section" class="rpbdd-input" readonly />
+            </div>
+            <div class="rpbdd-report-cat-display-photo-row">
+                <div id="rpbdd-report-cat-display-photo-preview" class="rpbdd-report-cat-display-photo-preview" aria-live="polite"></div>
+                <div class="rpbdd-report-cat-display-photo-actions">
+                    <label class="rpbdd-btn-sm rpbdd-btn-sm--blue rpbdd-report-cat-display-file-label">
+                        Choose photo
+                        <input type="file" id="rpbdd-report-cat-display-photo-file" accept="image/*" class="rpbdd-sr-only" />
+                    </label>
+                    <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--orange" id="rpbdd-report-cat-display-photo-remove">Remove photo</button>
+                </div>
+            </div>
+            <div class="rpbdd-report-cat-display-field">
+                <label for="rpbdd-report-cat-display-name">Name</label>
+                <input type="text" id="rpbdd-report-cat-display-name" class="rpbdd-input" autocomplete="name" />
+            </div>
+            <div class="rpbdd-report-cat-display-field">
+                <label for="rpbdd-report-cat-display-position">Position</label>
+                <input type="text" id="rpbdd-report-cat-display-position" class="rpbdd-input" autocomplete="organization-title" />
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--neutral" data-close-modal="modal-report-category-display">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-report-cat-display-save">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="rpbdd-modal-overlay" id="modal-notifications">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head">
+            <h2>Birthday Celebrants</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-notifications" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body rpbdd-modal-body--notifications">
+            <div class="rpbdd-notifications-panel-layout">
+                <div class="rpbdd-toolbar rpbdd-toolbar--notifications-modal">
+                    <div class="rpbdd-pill-group">
+                        <button type="button" class="rpbdd-pill is-active" data-birthday-view="upcoming">Upcoming (<span id="rpbdd-count-notif-unread">0</span>)</button>
+                        <button type="button" class="rpbdd-pill" data-birthday-view="done">Done (<span id="rpbdd-count-notif-read">0</span>)</button>
+                    </div>
+                    <div class="rpbdd-events-inline-search" style="flex:1 1 auto;max-width:26rem;">
+                        <div class="rpbdd-events-header-search">
+                            <div class="rpbdd-events-search-field">
+                                <span class="rpbdd-events-search-icon" aria-hidden="true">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                                </span>
+                                <input type="search" class="rpbdd-events-search-input" id="rpbdd-bday-search" placeholder="Search name, section, or position..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-open-add-birthday">+ Add Birthdate</button>
+                </div>
+                <div class="rpbdd-events-month-bar" id="rpbdd-bday-modal-month-bar">
+                    <h3 class="rpbdd-events-month-title" id="rpbdd-bday-modal-month-label">Month</h3>
+                    <div class="rpbdd-events-month-nav">
+                        <button type="button" class="rpbdd-events-month-btn" id="rpbdd-bday-modal-prev-month" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                        <button type="button" class="rpbdd-events-month-btn" id="rpbdd-bday-modal-next-month" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+                    </div>
+                </div>
+                <div id="rpbdd-notifications-list" class="rpbdd-events-list-fill"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-add-birthday">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head">
+            <h2>Add Birthday Celebrant</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-add-birthday" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="birthday-photo">Photo</label>
+                <div class="rpbdd-team-photo-row-inner">
+                    <div class="rpbdd-team-photo-avatar" id="birthday-photo-avatar">
+                        <span class="rpbdd-team-photo-camera" aria-hidden="true">
+                            <svg class="rpbdd-team-photo-camera-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </span>
+                        <span id="birthday-photo-initials" class="rpbdd-account-photo-fallback" hidden aria-hidden="true"></span>
+                        <img class="rpbdd-team-photo-preview" id="birthday-photo-preview" alt="">
+                    </div>
+                    <div class="rpbdd-team-photo-side">
+                        <input type="file" id="birthday-photo" name="birthday_photo" accept="image/*" class="rpbdd-sr-only">
+                        <label for="birthday-photo" class="rpbdd-btn-team-upload">Choose Photo</label>
+                        <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--orange" id="birthday-photo-remove">Remove</button>
+                    </div>
+                </div>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="birthday-name">Name</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="birthday-name" type="text" autocomplete="off">
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="birthday-position-trigger">Position</label>
+                <select class="rpbdd-select" id="birthday-position" style="display:none"></select>
+                <div style="position:relative;margin-top:0.35rem">
+                    <button type="button" id="birthday-position-trigger" class="rpbdd-select" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center">
+                        <span id="birthday-position-label">Select position</span><span aria-hidden="true">▾</span>
+                    </button>
+                    <div id="birthday-position-menu" style="display:none;position:absolute;z-index:40;left:0;right:0;top:calc(100% + 0.35rem);background:var(--rp-surface);border:1px solid var(--rp-border);border-radius:0.6rem;box-shadow:0 8px 24px rgba(15,23,42,0.14);padding:0.45rem;max-height:14rem;overflow:auto">
+                        <div id="birthday-position-list" style="display:flex;flex-direction:column;gap:0.35rem"></div>
+                        <div style="margin-top:0.45rem;padding-top:0.45rem;border-top:1px solid var(--rp-border)">
+                            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green rpbdd-btn-sm--dense" id="rpbdd-add-birthday-position">+ Add Position</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="birthday-section-trigger">Section</label>
+                <select class="rpbdd-select" id="birthday-section" style="display:none"></select>
+                <div style="position:relative;margin-top:0.35rem">
+                    <button type="button" id="birthday-section-trigger" class="rpbdd-select" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center">
+                        <span id="birthday-section-label">Select section</span><span aria-hidden="true">▾</span>
+                    </button>
+                    <div id="birthday-section-menu" style="display:none;position:absolute;z-index:40;left:0;right:0;top:calc(100% + 0.35rem);background:var(--rp-surface);border:1px solid var(--rp-border);border-radius:0.6rem;box-shadow:0 8px 24px rgba(15,23,42,0.14);padding:0.45rem;max-height:14rem;overflow:auto">
+                        <div id="birthday-section-list" style="display:flex;flex-direction:column;gap:0.35rem"></div>
+                        <div style="margin-top:0.45rem;padding-top:0.45rem;border-top:1px solid var(--rp-border)">
+                            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green rpbdd-btn-sm--dense" id="rpbdd-add-birthday-section">+ Add Section</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="birthday-dob">Date of Birth</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="birthday-dob" type="date">
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" data-close-modal="modal-add-birthday">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-save-add-birthday">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-add-birthday-option">
+    <div class="rpbdd-modal">
+        <div class="rpbdd-modal-head">
+            <h2 id="rpbdd-birthday-option-title">Add Option</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-add-birthday-option" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <input type="hidden" id="rpbdd-birthday-option-kind" value="">
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="rpbdd-birthday-option-value">Value</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="rpbdd-birthday-option-value" type="text" autocomplete="off" placeholder="Enter value...">
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" data-close-modal="modal-add-birthday-option">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-save-birthday-option">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-notifications-read-recycle">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head rpbdd-modal-head--recycle">
+            <div class="rpbdd-modal-head-leading">
+                <span class="rpbdd-modal-head-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="12" y1="11" x2="12" y2="17"/><path d="M9 13h6"/></svg>
+                </span>
+                <div>
+                    <h2>Read notifications - Recycle Bin</h2>
+                    <p class="rpbdd-modal-muted" style="margin:0.35rem 0 0;font-size:0.85rem">Items you moved from the Read tab. Restore them to Read or delete them permanently.</p>
+                </div>
+            </div>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-notifications-read-recycle" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body rpbdd-modal-body--recycle" id="rpbdd-notifications-read-recycle-list"></div>
+        <div class="rpbdd-modal-foot rpbdd-modal-foot--recycle">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-action--restore" id="rpbdd-notifications-read-recycle-restore-all">Restore All</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-action--delete" id="rpbdd-notifications-read-recycle-delete-all">Delete All</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-account">
+    <div class="rpbdd-modal rpbdd-modal--xl">
+        <div class="rpbdd-modal-head">
+            <h2>Account Management</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-account" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <div id="rpbdd-account-intro-wrap">
+                <p class="rpbdd-modal-intro">Signed in as <strong>monitoring@rpbdd.gov.ph</strong>. Use this space to manage your portal profile.</p>
+            </div>
+            <div id="rpbdd-account-leader-wrap" class="rpbdd-account-leader-wrap" hidden>
+                <p class="rpbdd-modal-muted" style="margin-top:0">Your profile is linked to <strong>Total Teams</strong> (same data as on the team card). To modify details, click Edit to open the same Team Edit modal.</p>
+                <div class="rpbdd-team-photo-block">
+                    <p class="rpbdd-team-photo-heading"><strong>Profile Photo</strong></p>
+                    <div class="rpbdd-team-photo-row-inner">
+                        <div class="rpbdd-team-photo-avatar" id="account-photo-avatar">
+                            <span class="rpbdd-team-photo-camera" aria-hidden="true">
+                                <svg class="rpbdd-team-photo-camera-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            </span>
+                            <span id="account-photo-initials" class="rpbdd-account-photo-fallback" hidden aria-hidden="true"></span>
+                            <img class="rpbdd-team-photo-preview" id="account-photo-preview" alt="">
+                        </div>
+                        <div class="rpbdd-team-photo-side">
+                            <input type="file" id="account-photo" name="account_photo" accept="image/*" class="rpbdd-sr-only">
+                            <label for="account-photo" class="rpbdd-btn-team-upload">Change Photo</label>
+                            <p class="rpbdd-team-photo-hint">JPG, PNG or GIF (max. 5MB)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rpbdd-form-row"><label class="rpbdd-label" for="account-lead-id">Lead ID</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="account-lead-id" name="account_lead_id" type="text" readonly autocomplete="off"></div>
+                <div class="rpbdd-form-row"><label class="rpbdd-label" for="account-email">Email</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="account-email" name="account_email" type="email" readonly autocomplete="email"></div>
+                <div class="rpbdd-form-row">
+                    <label class="rpbdd-label" for="account-password">Password</label>
+                    <div class="rpbdd-input-wrap rpbdd-input-wrap--modal-pw">
+                        <svg class="rpbdd-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input class="rpbdd-input rpbdd-input--simple rpbdd-input--pr rpbdd-input--locked" id="account-password" name="account_password" type="password" readonly autocomplete="off">
+                        <button type="button" class="rpbdd-toggle-pw" data-toggle-password="account-password" aria-label="Show password" aria-pressed="false">
+                            <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--masked" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </span>
+                            <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--visible" aria-hidden="true" hidden>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="rpbdd-form-row"><label class="rpbdd-label" for="account-team-leader">Section Chief</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="account-team-leader" name="account_team_leader" type="text" readonly autocomplete="off"></div>
+                <div class="rpbdd-form-row"><label class="rpbdd-label" for="account-section-team">Section Team</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="account-section-team" name="account_section_team" type="text" readonly autocomplete="off"></div>
+                <div class="rpbdd-modal-foot" id="rpbdd-account-foot-leader" hidden>
+                    <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-edit-account-profile">Edit</button>
+                </div>
+            </div>
+            <div id="rpbdd-account-member-wrap" class="rpbdd-account-leader-wrap" hidden>
+                <p class="rpbdd-modal-muted" style="margin-top:0">Your profile is linked to <strong>Total Members</strong> (same data as on the member card). To modify details, click Edit to open the same Member Edit modal.</p>
+                <div class="rpbdd-team-photo-block">
+                    <p class="rpbdd-team-photo-heading"><strong>Profile Photo</strong></p>
+                    <div class="rpbdd-team-photo-row-inner">
+                        <div class="rpbdd-team-photo-avatar" id="account-member-photo-avatar">
+                            <span class="rpbdd-team-photo-camera" aria-hidden="true">
+                                <svg class="rpbdd-team-photo-camera-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            </span>
+                            <span id="account-member-photo-initials" class="rpbdd-account-photo-fallback" hidden aria-hidden="true"></span>
+                            <img class="rpbdd-team-photo-preview" id="account-member-photo-preview" alt="">
+                        </div>
+                        <div class="rpbdd-team-photo-side">
+                            <input type="file" id="account-member-photo-input" name="account_member_photo" accept="image/*" class="rpbdd-sr-only">
+                            <label for="account-member-photo-input" class="rpbdd-btn-team-upload">Change Photo</label>
+                            <p class="rpbdd-team-photo-hint">JPG, PNG or GIF (max. 5MB)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rpbdd-form-row"><label class="rpbdd-label" for="account-member-email">Email</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="account-member-email" name="account_member_email" type="email" readonly autocomplete="email"></div>
+                <div class="rpbdd-form-row">
+                    <label class="rpbdd-label" for="account-member-password">Password</label>
+                    <div class="rpbdd-input-wrap rpbdd-input-wrap--modal-pw">
+                        <svg class="rpbdd-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input class="rpbdd-input rpbdd-input--simple rpbdd-input--pr rpbdd-input--locked" id="account-member-password" name="account_member_password" type="password" readonly autocomplete="off">
+                        <button type="button" class="rpbdd-toggle-pw" data-toggle-password="account-member-password" aria-label="Show password" aria-pressed="false">
+                            <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--masked" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </span>
+                            <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--visible" aria-hidden="true" hidden>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="rpbdd-form-row"><label class="rpbdd-label" for="account-member-team">Team</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="account-member-team" name="account_member_team" type="text" readonly autocomplete="off"></div>
+                <div class="rpbdd-modal-foot" id="rpbdd-account-foot-member" hidden>
+                    <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-edit-account-member-profile">Edit</button>
+                </div>
+            </div>
+            <div id="rpbdd-account-admin-wrap" class="rpbdd-account-leader-wrap" hidden>
+                <p class="rpbdd-modal-muted" style="margin-top:0">This is a dedicated Administrator account profile (not linked to Total Members).</p>
+                <div class="rpbdd-team-photo-block">
+                    <p class="rpbdd-team-photo-heading"><strong>Photo</strong></p>
+                    <div class="rpbdd-team-photo-row-inner">
+                        <div class="rpbdd-team-photo-avatar" id="account-admin-photo-avatar">
+                            <span class="rpbdd-team-photo-camera" aria-hidden="true">
+                                <svg class="rpbdd-team-photo-camera-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            </span>
+                            <span id="account-admin-photo-initials" class="rpbdd-account-photo-fallback" hidden aria-hidden="true"></span>
+                            <img class="rpbdd-team-photo-preview" id="account-admin-photo-preview" alt="">
+                        </div>
+                        <div class="rpbdd-team-photo-side">
+                            <input type="file" id="account-admin-photo-input" name="account_admin_photo" accept="image/*" class="rpbdd-sr-only">
+                            <label for="account-admin-photo-input" class="rpbdd-btn-team-upload">Change Photo</label>
+                            <p class="rpbdd-team-photo-hint">JPG, PNG or GIF (max. 5MB)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rpbdd-form-row"><label class="rpbdd-label" for="account-admin-email">Email</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="account-admin-email" type="email" readonly autocomplete="email"></div>
+                <div class="rpbdd-form-row">
+                    <label class="rpbdd-label" for="account-admin-password">Password</label>
+                    <div class="rpbdd-input-wrap rpbdd-input-wrap--modal-pw">
+                        <svg class="rpbdd-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input class="rpbdd-input rpbdd-input--simple rpbdd-input--pr rpbdd-input--locked" id="account-admin-password" type="password" readonly autocomplete="off">
+                        <button type="button" class="rpbdd-toggle-pw" data-toggle-password="account-admin-password" aria-label="Show password" aria-pressed="false">
+                            <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--masked" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </span>
+                            <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--visible" aria-hidden="true" hidden>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="rpbdd-form-row"><label class="rpbdd-label" for="account-admin-role">Role</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="account-admin-role" type="text" value="Admin" readonly autocomplete="off" aria-readonly="true"></div>
+                <div class="rpbdd-modal-foot" id="rpbdd-account-foot-admin">
+                    <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-edit-account-admin-profile">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-edit-admin-account">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head">
+            <h2>Edit Admin Account</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-edit-admin-account" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <div class="rpbdd-form-row"><label class="rpbdd-label" for="edit-admin-email">Email</label><input class="rpbdd-input rpbdd-input--simple" id="edit-admin-email" type="email" maxlength="255" autocomplete="email"></div>
+            <div class="rpbdd-form-row"><label class="rpbdd-label" for="edit-admin-role">Role</label><input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="edit-admin-role" type="text" value="Admin" readonly autocomplete="off" aria-readonly="true"></div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="edit-admin-password">New Password (optional)</label>
+                <div class="rpbdd-input-wrap rpbdd-input-wrap--modal-pw">
+                    <svg class="rpbdd-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input class="rpbdd-input rpbdd-input--simple rpbdd-input--pr" id="edit-admin-password" type="password" autocomplete="new-password">
+                    <button type="button" class="rpbdd-toggle-pw" data-toggle-password="edit-admin-password" aria-label="Show password" aria-pressed="false">
+                        <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--masked" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </span>
+                        <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--visible" aria-hidden="true" hidden>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" data-close-modal="modal-edit-admin-account">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-save-admin-account">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-add-event">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head">
+            <h2>Add New Event</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-add-event" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="add-title">Event Title</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="add-title" name="title" type="text" placeholder="Title" autocomplete="off">
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="add-description">Description</label>
+                <textarea class="rpbdd-textarea" id="add-description" name="description" placeholder="Description" rows="3"></textarea>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="add-location">Location</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="add-location" name="location" type="text" placeholder="Location" autocomplete="off">
+            </div>
+            <div class="rpbdd-form-row">
+                <div class="rpbdd-form-label-row">
+                    <span id="rpbdd-add-dates-label" class="rpbdd-label">Dates</span>
+                    <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green rpbdd-btn-sm--dense" id="rpbdd-add-date-row">+ Add Date</button>
+                </div>
+                <div id="rpbdd-date-rows" class="rpbdd-date-rows" role="group" aria-labelledby="rpbdd-add-dates-label"></div>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="add-time">Time</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="add-time" name="time" type="time">
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="add-category">Category</label>
+                <select class="rpbdd-select" id="add-category" name="category" style="display:none">
+                    <option value="">Select category</option>
+                </select>
+                <div style="position:relative;margin-top:0.35rem">
+                    <button type="button" id="rpbdd-category-dropdown-trigger" class="rpbdd-select" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center">
+                        <span id="rpbdd-category-dropdown-label">Select category</span><span aria-hidden="true">▾</span>
+                    </button>
+                    <div id="rpbdd-category-dropdown-menu" style="display:none;position:absolute;z-index:40;left:0;right:0;top:calc(100% + 0.35rem);background:var(--rp-surface);border:1px solid var(--rp-border);border-radius:0.6rem;box-shadow:0 8px 24px rgba(15,23,42,0.14);padding:0.45rem;max-height:14rem;overflow:auto">
+                        <div id="rpbdd-category-manage-list" style="display:flex;flex-direction:column;gap:0.35rem"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="add-input-by">Input By</label>
+                <input class="rpbdd-input rpbdd-input--simple rpbdd-input--locked" id="add-input-by" name="input_by" type="text" value="" disabled autocomplete="off">
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" data-close-modal="modal-add-event">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-save-add-event">Add Event</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-edit-event">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head">
+            <h2>Edit Event</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-edit-event" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="edit-title">Title</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="edit-title" name="edit_title" type="text" autocomplete="off">
+            </div>
+            <div class="rpbdd-form-row">
+                <div class="rpbdd-form-label-row">
+                    <span id="rpbdd-edit-dates-label" class="rpbdd-label">Dates</span>
+                    <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green rpbdd-btn-sm--dense" id="rpbdd-edit-add-date-row">+ Add Date</button>
+                </div>
+                <div id="rpbdd-edit-date-rows" class="rpbdd-date-rows" role="group" aria-labelledby="rpbdd-edit-dates-label"></div>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="edit-description">Description</label>
+                <textarea class="rpbdd-textarea" id="edit-description" name="edit_description" rows="3"></textarea>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="edit-location">Location</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="edit-location" name="edit_location" type="text" autocomplete="off">
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="edit-time">Time</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="edit-time" name="edit_time" type="time">
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="edit-category">Category</label>
+                <select class="rpbdd-select" id="edit-category" name="edit_category" style="display:none">
+                    <option value="">Select category</option>
+                </select>
+                <div style="position:relative;margin-top:0.35rem">
+                    <button type="button" id="rpbdd-edit-category-dropdown-trigger" class="rpbdd-select" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center">
+                        <span id="rpbdd-edit-category-dropdown-label">Select category</span><span aria-hidden="true">▾</span>
+                    </button>
+                    <div id="rpbdd-edit-category-dropdown-menu" style="display:none;position:absolute;z-index:40;left:0;right:0;top:calc(100% + 0.35rem);background:var(--rp-surface);border:1px solid var(--rp-border);border-radius:0.6rem;box-shadow:0 8px 24px rgba(15,23,42,0.14);padding:0.45rem;max-height:14rem;overflow:auto">
+                        <div id="rpbdd-edit-category-manage-list" style="display:flex;flex-direction:column;gap:0.35rem"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" data-close-modal="modal-edit-event">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-save-edit-event">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-recycle">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head rpbdd-modal-head--recycle">
+            <div class="rpbdd-modal-head-leading">
+                <span class="rpbdd-modal-head-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="12" y1="11" x2="12" y2="17"/><path d="M9 13h6"/></svg>
+                </span>
+                <h2>Recycle Bin</h2>
+            </div>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-recycle" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body rpbdd-modal-body--recycle rpbdd-modal-body--recycle-events">
+            <div id="rpbdd-recycle-list" class="rpbdd-events-list-fill" data-events-list-view="done"></div>
+            <div class="rpbdd-events-pagination-wrap">
+                <div class="rpbdd-events-pagination-bar">
+                    <div class="rpbdd-events-pagination" id="rpbdd-recycle-pagination" hidden></div>
+                </div>
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot rpbdd-modal-foot--recycle">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-action--restore" id="rpbdd-recycle-restore-all">Restore All</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-action--delete" id="rpbdd-recycle-delete-all">Delete All</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-teams-recycle">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head rpbdd-modal-head--recycle">
+            <div>
+                <h2>Teams Recycle Bin</h2>
+                <p class="rpbdd-modal-muted" style="margin:0.35rem 0 0;font-size:0.85rem">Removed teams from Total Teams. Restore or delete permanently.</p>
+            </div>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-teams-recycle" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body rpbdd-modal-body--recycle" id="rpbdd-teams-recycle-list"></div>
+        <div class="rpbdd-modal-foot rpbdd-modal-foot--recycle">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-action--restore" id="rpbdd-teams-recycle-restore-all">Restore All</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-action--delete" id="rpbdd-teams-recycle-delete-all">Delete All</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-members-recycle">
+    <div class="rpbdd-modal rpbdd-modal--lg">
+        <div class="rpbdd-modal-head rpbdd-modal-head--recycle">
+            <div>
+                <h2>Members Recycle Bin</h2>
+                <p class="rpbdd-modal-muted" style="margin:0.35rem 0 0;font-size:0.85rem">Removed members from Total Members. Restore or delete permanently.</p>
+            </div>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-members-recycle" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body rpbdd-modal-body--recycle" id="rpbdd-members-recycle-list"></div>
+        <div class="rpbdd-modal-foot rpbdd-modal-foot--recycle">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-action--restore" id="rpbdd-members-recycle-restore-all">Restore All</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-action--delete" id="rpbdd-members-recycle-delete-all">Delete All</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay rpbdd-modal-overlay--confirm" id="modal-rpbdd-confirm" aria-hidden="true">
+    <div class="rpbdd-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="rpbdd-confirm-title">
+        <div class="rpbdd-confirm-panel__accent" data-confirm-accent aria-hidden="true"></div>
+        <div class="rpbdd-confirm-panel__body">
+            <div class="rpbdd-confirm-panel__icon-wrap">
+                <span class="rpbdd-confirm-icon-slot" data-confirm-icon-slot></span>
+            </div>
+            <h3 id="rpbdd-confirm-title" class="rpbdd-confirm-panel__title" data-confirm-title>Confirm</h3>
+            <div class="rpbdd-confirm-panel__desc">
+                <span class="rpbdd-confirm-panel__desc-label">Notice</span>
+                <p class="rpbdd-confirm-panel__message" data-confirm-message></p>
+            </div>
+            <div class="rpbdd-confirm-panel__actions">
+                <button type="button" class="rpbdd-confirm-panel__btn rpbdd-confirm-panel__btn--ghost" data-confirm-cancel>Cancel</button>
+                <button type="button" class="rpbdd-confirm-panel__btn rpbdd-confirm-panel__btn--primary" data-confirm-ok>Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert modal: used for form validation (unique per modal) -->
+<div class="rpbdd-modal-overlay rpbdd-modal-overlay--confirm" id="modal-rpbdd-alert" aria-hidden="true">
+    <div class="rpbdd-confirm-panel rpbdd-confirm-panel--tone-neutral" role="dialog" aria-modal="true" aria-labelledby="rpbdd-alert-title">
+        <div class="rpbdd-confirm-panel__accent rpbdd-confirm-panel__accent--neutral" aria-hidden="true"></div>
+        <div class="rpbdd-confirm-panel__body">
+            <div class="rpbdd-confirm-panel__icon-wrap">
+                <span class="rpbdd-confirm-icon-slot rpbdd-confirm-icon-slot--neutral" aria-hidden="true">
+                    <svg class="rpbdd-confirm-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </span>
+            </div>
+            <h3 id="rpbdd-alert-title" class="rpbdd-confirm-panel__title" data-alert-title>Notice</h3>
+            <div class="rpbdd-confirm-panel__desc">
+                <span class="rpbdd-confirm-panel__desc-label">Alert</span>
+                <p class="rpbdd-confirm-panel__message" data-alert-message></p>
+            </div>
+            <div class="rpbdd-confirm-panel__actions">
+                <button type="button" class="rpbdd-confirm-panel__btn rpbdd-confirm-panel__btn--primary rpbdd-confirm-ok--neutral" data-alert-ok>OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-category-editor">
+    <div class="rpbdd-modal" style="max-width:420px">
+        <div class="rpbdd-modal-head">
+            <h2 id="rpbdd-category-editor-title">Category</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-category-editor" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <p class="rpbdd-modal-muted" id="rpbdd-category-editor-hint" style="margin-top:0"></p>
+            <div class="rpbdd-form-row" id="rpbdd-category-editor-add-wrap">
+                <label class="rpbdd-label" for="rpbdd-category-editor-input">Category name</label>
+                <input class="rpbdd-input rpbdd-input--simple" id="rpbdd-category-editor-input" type="text" autocomplete="off" placeholder="Enter category name">
+                <label class="rpbdd-label" for="rpbdd-category-editor-color" style="margin-top:0.55rem">Legend color</label>
+                <input id="rpbdd-category-editor-color" type="color" value="#3B82F6" style="width:100%;max-width:5.5rem;height:2.25rem;border:1px solid var(--rp-border);border-radius:0.5rem;background:transparent;cursor:pointer">
+                <div id="rpbdd-category-color-swatches" style="margin-top:0.5rem;display:flex;flex-wrap:wrap;gap:0.35rem"></div>
+                <div id="rpbdd-category-editor-preview" style="margin-top:0.65rem;display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.55rem 0.65rem;border:1px solid var(--rp-border);border-radius:0.55rem;background:color-mix(in srgb, var(--rp-surface) 88%, transparent)">
+                    <div style="display:flex;align-items:center;gap:0.4rem;min-width:0">
+                        <span id="rpbdd-category-preview-dot" style="width:0.8rem;height:0.8rem;border-radius:50%;background:#3B82F6;flex-shrink:0"></span>
+                        <span id="rpbdd-category-preview-label" style="font-size:0.85rem;color:var(--rp-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Category</span>
+                    </div>
+                    <span id="rpbdd-category-preview-badge" style="font-size:0.68rem;font-weight:600;padding:0.12rem 0.42rem;border-radius:999px;border:1px solid #3B82F6;color:#3B82F6;background:color-mix(in srgb, #3B82F6 14%, transparent)">Sample event</span>
+                </div>
+            </div>
+            <div class="rpbdd-form-row" id="rpbdd-category-editor-remove-wrap" hidden>
+                <label class="rpbdd-label" for="rpbdd-category-remove-select">Select category</label>
+                <select class="rpbdd-select" id="rpbdd-category-remove-select"></select>
+            </div>
+            <div class="rpbdd-form-row" id="rpbdd-category-editor-edit-wrap" hidden>
+                <label class="rpbdd-label" for="rpbdd-category-edit-select">Select category</label>
+                <select class="rpbdd-select" id="rpbdd-category-edit-select"></select>
+                <label class="rpbdd-label" for="rpbdd-category-edit-color" style="margin-top:0.55rem">New legend color</label>
+                <input id="rpbdd-category-edit-color" type="color" value="#3B82F6" style="width:100%;max-width:5.5rem;height:2.25rem;border:1px solid var(--rp-border);border-radius:0.5rem;background:transparent;cursor:pointer">
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" data-close-modal="modal-category-editor">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-category-editor-save">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Team edit success: no buttons, auto-dismiss 3s (see showTeamEditSuccessToast in calendar-app.js) -->
+<div class="rpbdd-team-success-toast-overlay" id="rpbdd-team-success-toast" aria-hidden="true">
+    <div class="rpbdd-team-toast" role="status">
+        <div class="rpbdd-team-toast__accent" aria-hidden="true"></div>
+        <div class="rpbdd-team-toast__body">
+            <span class="rpbdd-team-toast__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </span>
+            <p class="rpbdd-team-toast__message" id="rpbdd-team-success-toast-message"></p>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-add-team">
+    <div class="rpbdd-modal">
+        <div class="rpbdd-modal-head">
+            <h2 id="rpbdd-modal-add-team-title">Add New Team</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-add-team" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <div class="rpbdd-team-photo-block">
+                <p class="rpbdd-team-photo-heading"><strong>Profile Photo</strong><span class="rpbdd-team-photo-optional"> (Optional)</span></p>
+                <div class="rpbdd-team-photo-row-inner">
+                    <div class="rpbdd-team-photo-avatar" id="team-photo-avatar">
+                        <span class="rpbdd-team-photo-camera" aria-hidden="true">
+                            <svg class="rpbdd-team-photo-camera-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </span>
+                        <img class="rpbdd-team-photo-preview" id="team-photo-preview" alt="">
+                    </div>
+                    <div class="rpbdd-team-photo-side">
+                        <input type="file" id="team-photo" name="team_photo" accept="image/*" class="rpbdd-sr-only">
+                        <label for="team-photo" class="rpbdd-btn-team-upload">Upload Photo</label>
+                        <p class="rpbdd-team-photo-hint">JPG, PNG or GIF (max. 5MB)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="rpbdd-form-row"><label class="rpbdd-label" for="team-lead-id">Lead ID</label><input class="rpbdd-input rpbdd-input--simple" id="team-lead-id" name="team_lead_id" type="text" autocomplete="off"></div>
+            <div class="rpbdd-form-row"><label class="rpbdd-label" for="team-email">Email</label><input class="rpbdd-input rpbdd-input--simple" id="team-email" name="team_email" type="email" autocomplete="email"></div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="team-password">Password</label>
+                <div class="rpbdd-input-wrap rpbdd-input-wrap--modal-pw">
+                    <svg class="rpbdd-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input class="rpbdd-input rpbdd-input--simple rpbdd-input--pr" type="password" id="team-password" name="team_password" autocomplete="new-password" placeholder="Enter password">
+                    <button type="button" class="rpbdd-toggle-pw" data-toggle-password="team-password" aria-label="Show password" aria-pressed="false">
+                        <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--masked" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </span>
+                        <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--visible" aria-hidden="true" hidden>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="rpbdd-form-row"><label class="rpbdd-label" for="team-leader">Section Chief</label><input class="rpbdd-input rpbdd-input--simple" id="team-leader" name="team_leader" type="text" autocomplete="off"></div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" id="team-section-label" for="team-section-trigger">Section Team</label>
+                <div class="rpbdd-custom-dd" id="team-section-dd">
+                    <input type="hidden" id="team-section" name="team_section" value="">
+                    <button type="button" class="rpbdd-custom-dd-trigger rpbdd-input rpbdd-input--simple is-placeholder" id="team-section-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="team-section-label team-section-trigger-text">
+                        <span class="rpbdd-custom-dd-value" id="team-section-trigger-text">Select section team...</span>
+                        <span class="rpbdd-custom-dd-chevron" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+                    </button>
+                    <div class="rpbdd-custom-dd-menu" id="team-section-menu" hidden role="listbox" aria-labelledby="team-section-label">
+                        <div class="rpbdd-custom-dd-scroll" id="team-section-options"></div>
+                        <div class="rpbdd-custom-dd-footer">
+                            <div class="rpbdd-dd-add-row rpbdd-dd-add-row--in-menu">
+                                <input type="text" class="rpbdd-input rpbdd-input--simple rpbdd-dd-add-input" id="team-section-new" name="team_section_new" placeholder="Add new section..." autocomplete="off" aria-label="New section for dropdown list">
+                                <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="team-section-add">Add</button>
+                            </div>
+                            <p class="rpbdd-dd-add-hint">Saved for this list only (not as a team row).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" id="team-position-label" for="team-position-trigger">Position</label>
+                <div class="rpbdd-custom-dd" id="team-position-dd">
+                    <input type="hidden" id="team-position" name="team_position" value="">
+                    <button type="button" class="rpbdd-custom-dd-trigger rpbdd-input rpbdd-input--simple is-placeholder" id="team-position-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="team-position-label team-position-trigger-text">
+                        <span class="rpbdd-custom-dd-value" id="team-position-trigger-text">Select position...</span>
+                        <span class="rpbdd-custom-dd-chevron" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+                    </button>
+                    <div class="rpbdd-custom-dd-menu" id="team-position-menu" hidden role="listbox" aria-labelledby="team-position-label">
+                        <div class="rpbdd-custom-dd-scroll" id="team-position-options"></div>
+                        <div class="rpbdd-custom-dd-footer">
+                            <div class="rpbdd-dd-add-row rpbdd-dd-add-row--in-menu">
+                                <input type="text" class="rpbdd-input rpbdd-input--simple rpbdd-dd-add-input" id="team-position-new" name="team_position_new" placeholder="Add new position..." autocomplete="off" aria-label="New position for dropdown list">
+                                <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="team-position-add">Add</button>
+                            </div>
+                            <p class="rpbdd-dd-add-hint">Saved for this list only (not as a team row).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" data-close-modal="modal-add-team">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-save-team">Add Team</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-add-member">
+    <div class="rpbdd-modal">
+        <div class="rpbdd-modal-head">
+            <h2 id="rpbdd-modal-add-member-title">Add New Member</h2>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-add-member" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body">
+            <div class="rpbdd-team-photo-block">
+                <p class="rpbdd-team-photo-heading"><strong>Profile Photo</strong><span class="rpbdd-team-photo-optional"> (Optional)</span></p>
+                <div class="rpbdd-team-photo-row-inner">
+                    <div class="rpbdd-team-photo-avatar" id="member-photo-avatar">
+                        <span class="rpbdd-team-photo-camera" aria-hidden="true">
+                            <svg class="rpbdd-team-photo-camera-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </span>
+                        <img class="rpbdd-team-photo-preview" id="member-photo-preview" alt="">
+                    </div>
+                    <div class="rpbdd-team-photo-side">
+                        <input type="file" id="member-photo" name="member_photo" accept="image/*" class="rpbdd-sr-only">
+                        <label for="member-photo" class="rpbdd-btn-team-upload">Upload Photo</label>
+                        <p class="rpbdd-team-photo-hint">JPG, PNG or GIF (max. 5MB)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="rpbdd-form-row"><label class="rpbdd-label" for="member-email">Email</label><input class="rpbdd-input rpbdd-input--simple" id="member-email" name="member_email" type="email" autocomplete="email"></div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" for="member-password">Password</label>
+                <div class="rpbdd-input-wrap rpbdd-input-wrap--modal-pw">
+                    <svg class="rpbdd-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input class="rpbdd-input rpbdd-input--simple rpbdd-input--pr" type="password" id="member-password" name="member_password" autocomplete="new-password" placeholder="Enter password">
+                    <button type="button" class="rpbdd-toggle-pw" data-toggle-password="member-password" aria-label="Show password" aria-pressed="false">
+                        <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--masked" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </span>
+                        <span class="rpbdd-toggle-pw__icon rpbdd-toggle-pw__icon--visible" aria-hidden="true" hidden>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="rpbdd-form-row">
+                <label class="rpbdd-label" id="member-team-label" for="member-team-trigger">Team</label>
+                <div class="rpbdd-custom-dd" id="member-team-dd">
+                    <input type="hidden" id="member-team" name="member_team" value="">
+                    <button type="button" class="rpbdd-custom-dd-trigger rpbdd-input rpbdd-input--simple is-placeholder" id="member-team-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="member-team-label member-team-trigger-text">
+                        <span class="rpbdd-custom-dd-value" id="member-team-trigger-text">Select team...</span>
+                        <span class="rpbdd-custom-dd-chevron" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+                    </button>
+                    <div class="rpbdd-custom-dd-menu" id="member-team-menu" hidden role="listbox" aria-labelledby="member-team-label">
+                        <div class="rpbdd-custom-dd-scroll" id="member-team-options"></div>
+                        <p class="rpbdd-dd-add-hint" style="margin:0.5rem 0.75rem 0.65rem;font-size:0.75rem;color:#64748b">Teams listed here come from <strong>Total Teams</strong> only. Add a team there first.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="rpbdd-modal-foot">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" data-close-modal="modal-add-member">Cancel</button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--green" id="rpbdd-save-member">Add Member</button>
+        </div>
+    </div>
+</div>
+
+<div class="rpbdd-modal-overlay" id="modal-team-export" aria-hidden="true">
+    <div class="rpbdd-modal rpbdd-modal--xl rpbdd-modal--export">
+        <div class="rpbdd-modal-head rpbdd-modal-head--export">
+            <div class="rpbdd-export-head-leading">
+                <span class="rpbdd-export-head-icon" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                </span>
+                <h2 id="rpbdd-team-export-title">Select Records to Export to PDF</h2>
+            </div>
+            <button type="button" class="rpbdd-modal-close" data-close-modal="modal-team-export" aria-label="Close">x</button>
+        </div>
+        <div class="rpbdd-modal-body rpbdd-modal-body--export">
+            <section class="rpbdd-export-block" aria-labelledby="rpbdd-export-date-range-label">
+                <h3 class="rpbdd-export-block-title" id="rpbdd-export-date-range-label">
+                    <span class="rpbdd-export-block-icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </span>
+                    Date Range:
+                </h3>
+                <div class="rpbdd-export-date-row">
+                    <div class="rpbdd-export-date-field">
+                        <label class="rpbdd-export-label" for="rpbdd-export-date-from">Date From:</label>
+                        <input type="date" class="rpbdd-input rpbdd-input--simple rpbdd-export-date-input" id="rpbdd-export-date-from" autocomplete="off">
+                    </div>
+                    <div class="rpbdd-export-date-field">
+                        <label class="rpbdd-export-label" for="rpbdd-export-date-to">Date To:</label>
+                        <input type="date" class="rpbdd-input rpbdd-input--simple rpbdd-export-date-input" id="rpbdd-export-date-to" autocomplete="off">
+                    </div>
+                    <button type="button" class="rpbdd-btn-export-filter" id="rpbdd-export-apply-filter">
+                        <svg class="rpbdd-btn-export-filter__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                        Apply Filter
+                    </button>
+                </div>
+                <p class="rpbdd-export-date-hint rpbdd-modal-muted" id="rpbdd-export-date-hint">Date range applies to <strong>Activity Logs</strong> (log date). For Teams / Members / Active Users, all listed records are shown.</p>
+            </section>
+            <section class="rpbdd-export-block" aria-labelledby="rpbdd-export-records-label">
+                <h3 class="rpbdd-export-block-title" id="rpbdd-export-records-label">
+                    <span class="rpbdd-export-block-icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </span>
+                    Records to be exported:
+                </h3>
+                <div class="rpbdd-export-toolbar">
+                    <button type="button" class="rpbdd-btn-export-select" id="rpbdd-export-select-all">Select All</button>
+                    <button type="button" class="rpbdd-btn-export-deselect" id="rpbdd-export-deselect-all">Deselect All</button>
+                    <span class="rpbdd-export-count" id="rpbdd-export-selected-count">(0 selected)</span>
+                </div>
+                <div class="rpbdd-export-table-scroll" role="region" aria-label="Exportable records" tabindex="0">
+                    <table class="rpbdd-export-table" id="rpbdd-export-table">
+                        <thead>
+                            <tr id="rpbdd-export-table-head-row"></tr>
+                        </thead>
+                        <tbody id="rpbdd-export-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <div class="rpbdd-modal-foot rpbdd-modal-foot--export">
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--neutral rpbdd-btn-export-cancel" data-close-modal="modal-team-export">
+                <span class="rpbdd-btn-export-cancel__x" aria-hidden="true">x</span>
+                Cancel
+            </button>
+            <button type="button" class="rpbdd-btn-sm rpbdd-btn-sm--orange rpbdd-btn-export-pdf" id="rpbdd-team-export-do-pdf">
+                <svg class="rpbdd-btn-sm__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                Export to PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="./assets/js/auth-forms.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./assets/js/supabase-events-adapter.js"></script>
+<script src="./assets/js/calendar-app.js"></script>
+<script>
+  (function () {
+    var logoutLink = document.querySelector('.rpbdd-btn-logout');
+    if (!logoutLink) return;
+    logoutLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      try {
+        if (window.top && window.top !== window) {
+          window.top.location.href = '/?logout=1';
+          return;
+        }
+      } catch (err) {
+        // Ignore cross-frame restrictions and fallback below.
+      }
+      window.location.href = '/?logout=1';
+    });
+  })();
+</script>
+</body>
+</html>
+
+
