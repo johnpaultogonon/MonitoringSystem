@@ -443,6 +443,43 @@
     return toJsonResponse({ ok: true, row: result.data || { kind: kind, value: value } });
   }
 
+  async function updateBirthdayOption(init) {
+    var body = parseBody(init);
+    var kind = String(body.kind || '').trim().toLowerCase();
+    var oldValue = String(body.old_value || '').trim();
+    var value = String(body.value || '').trim();
+    if ((kind !== 'position' && kind !== 'section') || !oldValue || !value) {
+      return toJsonResponse({ ok: false, error: 'Invalid option payload.' }, 400);
+    }
+    var upd = await db
+      .from(BIRTHDAY_OPTIONS_TABLE)
+      .update({ value: value, updated_at: new Date().toISOString() })
+      .eq('kind', kind)
+      .eq('value', oldValue)
+      .select('kind,value')
+      .single();
+    if (upd.error) {
+      var msg = String(upd.error.message || '');
+      if (msg.toLowerCase().indexOf('duplicate key value violates unique constraint') !== -1) {
+        return toJsonResponse({ ok: false, error: 'That value already exists.' }, 409);
+      }
+      return toJsonResponse({ ok: false, error: msg }, 500);
+    }
+    return toJsonResponse({ ok: true, row: upd.data || { kind: kind, value: value } });
+  }
+
+  async function deleteBirthdayOption(init) {
+    var body = parseBody(init);
+    var kind = String(body.kind || '').trim().toLowerCase();
+    var value = String(body.value || '').trim();
+    if ((kind !== 'position' && kind !== 'section') || !value) {
+      return toJsonResponse({ ok: false, error: 'Invalid option payload.' }, 400);
+    }
+    var del = await db.from(BIRTHDAY_OPTIONS_TABLE).delete().eq('kind', kind).eq('value', value);
+    if (del.error) return toJsonResponse({ ok: false, error: String(del.error.message || del.error) }, 500);
+    return toJsonResponse({ ok: true });
+  }
+
   function normalizeTaskListRow(row) {
     return {
       id: row.id,
@@ -1945,6 +1982,8 @@
       if (isBirthdays) {
         if (path === BIRTHDAYS_API_BASE + '/options' && method === 'GET') return await listBirthdayOptions();
         if (path === BIRTHDAYS_API_BASE + '/options' && method === 'POST') return await createBirthdayOption(init);
+        if (path === BIRTHDAYS_API_BASE + '/options/update' && method === 'POST') return await updateBirthdayOption(init);
+        if (path === BIRTHDAYS_API_BASE + '/options/delete' && method === 'POST') return await deleteBirthdayOption(init);
         if (path === BIRTHDAYS_API_BASE && method === 'GET') return await listBirthdays();
         if (path === BIRTHDAYS_API_BASE && method === 'POST') return await createBirthday(init);
         var bUpdate = path.match(/^\/supabase-birthdays-api\/([^/]+)\/update$/);

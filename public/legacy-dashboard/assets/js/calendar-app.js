@@ -2920,11 +2920,21 @@
         rpbddAlertMessage('No categories to remove');
         return;
       }
-      removeCategory(key);
-      renderCategoryDropdowns('', '');
-      renderCategoryLegend();
-      if (state.activeNav === 'reports') renderReportsPanel();
-      closeModal('modal-category-editor');
+      openRpbddConfirm({
+        variant: 'remove',
+        title: 'Remove category?',
+        message: '“' + key + '” will be removed from dropdown and legends.',
+        confirmLabel: 'Remove',
+        cancelLabel: 'Cancel',
+        danger: true,
+      }).then(function (ok) {
+        if (!ok) return;
+        removeCategory(key);
+        renderCategoryDropdowns('', '');
+        renderCategoryLegend();
+        if (state.activeNav === 'reports') renderReportsPanel();
+        closeModal('modal-category-editor');
+      });
       return;
     }
     if (mode === 'edit') {
@@ -3558,17 +3568,49 @@
   }
 
   function refreshBirthdayOptionsFromApi() {
-    return Promise.resolve();
+    var base = getBirthdaysApiBase();
+    if (!base) return Promise.resolve(false);
+    return fetch(base + '/options', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then(parseEventsApiResponse)
+      .then(function (parsed) {
+        var j = parsed.data;
+        if (!j || !j.ok) return false;
+        var pos = Array.isArray(j.positions) ? j.positions : [];
+        var sec = Array.isArray(j.sections) ? j.sections : [];
+        state.birthdayPositions = dedupeSortBirthdayOptions(pos);
+        state.birthdaySections = dedupeSortBirthdayOptions(sec);
+        saveBirthdayDropdowns();
+        renderBirthdaySelectOptions();
+        return true;
+      })
+      .catch(function () {
+        return false;
+      });
   }
 
-  function openBirthdayOptionModal(kind) {
+  function openBirthdayOptionModal(kind, mode, oldValue) {
     var k = String(kind || '').toLowerCase() === 'section' ? 'section' : 'position';
+    var m = String(mode || 'add').toLowerCase() === 'edit' ? 'edit' : 'add';
+    var oldVal = String(oldValue || '').trim();
     var kindEl = document.getElementById('rpbdd-birthday-option-kind');
     var titleEl = document.getElementById('rpbdd-birthday-option-title');
     var valEl = document.getElementById('rpbdd-birthday-option-value');
+    var saveBtn = document.getElementById('rpbdd-save-birthday-option');
     if (kindEl) kindEl.value = k;
-    if (titleEl) titleEl.textContent = k === 'section' ? 'Add Section' : 'Add Position';
-    if (valEl) valEl.value = '';
+    if (titleEl) {
+      if (m === 'edit') titleEl.textContent = k === 'section' ? 'Edit Section' : 'Edit Position';
+      else titleEl.textContent = k === 'section' ? 'Add Section' : 'Add Position';
+    }
+    if (valEl) valEl.value = m === 'edit' ? oldVal : '';
+    if (saveBtn) {
+      saveBtn.dataset.mode = m;
+      saveBtn.dataset.oldValue = m === 'edit' ? oldVal : '';
+      saveBtn.textContent = m === 'edit' ? 'Save Changes' : 'Save';
+    }
     closeBirthdayDropdownMenus();
     openModal('modal-add-birthday-option');
     if (valEl) {
@@ -3622,6 +3664,63 @@
     menu.style.display = open ? 'block' : 'none';
   }
 
+  function birthdayOptionExists(kind, value, excludeValue) {
+    var v = String(value || '').trim().toLowerCase();
+    var ex = String(excludeValue || '').trim().toLowerCase();
+    if (!v) return false;
+    var arr = kind === 'section' ? state.birthdaySections : state.birthdayPositions;
+    return (arr || []).some(function (x) {
+      var cur = String(x || '').trim().toLowerCase();
+      if (!cur) return false;
+      if (ex && cur === ex) return false;
+      return cur === v;
+    });
+  }
+
+  function setBirthdayOptionsByKind(kind, nextValues) {
+    var list = dedupeSortBirthdayOptions(nextValues || []);
+    if (kind === 'section') state.birthdaySections = list;
+    else state.birthdayPositions = list;
+    saveBirthdayDropdowns();
+    renderBirthdaySelectOptions();
+  }
+
+  function updateBirthdayOptionValue(kind, oldValue, nextValue) {
+    var oldV = String(oldValue || '').trim();
+    var newV = String(nextValue || '').trim();
+    if (!oldV || !newV) return false;
+    var arr = (kind === 'section' ? state.birthdaySections : state.birthdayPositions) || [];
+    var changed = false;
+    var out = arr.map(function (x) {
+      var cur = String(x || '').trim();
+      if (!cur) return cur;
+      if (cur.toLowerCase() !== oldV.toLowerCase()) return cur;
+      changed = true;
+      return newV;
+    });
+    if (!changed) return false;
+    setBirthdayOptionsByKind(kind, out);
+    return true;
+  }
+
+  function removeBirthdayOptionValue(kind, value) {
+    var v = String(value || '').trim();
+    if (!v) return false;
+    var arr = (kind === 'section' ? state.birthdaySections : state.birthdayPositions) || [];
+    var out = arr.filter(function (x) {
+      return String(x || '').trim().toLowerCase() !== v.toLowerCase();
+    });
+    if (out.length === arr.length) return false;
+    setBirthdayOptionsByKind(kind, out);
+    if (kind === 'section' && String((document.getElementById('birthday-section') || {}).value || '').trim().toLowerCase() === v.toLowerCase()) {
+      setBirthdayDropdownValue('section', '');
+    }
+    if (kind === 'position' && String((document.getElementById('birthday-position') || {}).value || '').trim().toLowerCase() === v.toLowerCase()) {
+      setBirthdayDropdownValue('position', '');
+    }
+    return true;
+  }
+
   function renderBirthdaySelectOptions() {
     var posEl = document.getElementById('birthday-position');
     var secEl = document.getElementById('birthday-section');
@@ -3645,18 +3744,69 @@
         posList.innerHTML = '';
         Array.prototype.slice.call(posEl.options).forEach(function (o) {
           if (!o.value) return;
+          var row = document.createElement('div');
+          row.className = 'rpbdd-bday-dd-row';
+          row.style.display = 'flex';
+          row.style.alignItems = 'center';
+          row.style.gap = '0.35rem';
           var btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'rpbdd-btn-sm rpbdd-bday-dd-option' + (o.value === selectedPos ? ' is-selected' : '');
           btn.style.textAlign = 'left';
           btn.style.justifyContent = 'flex-start';
-          btn.style.width = '100%';
+          btn.style.flex = '1 1 auto';
+          btn.style.minWidth = '0';
           btn.textContent = o.textContent;
           btn.addEventListener('click', function () {
             setBirthdayDropdownValue('position', o.value);
             closeBirthdayDropdownMenus();
           });
-          posList.appendChild(btn);
+          row.appendChild(btn);
+          var editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.className = 'rpbdd-btn-sm rpbdd-btn-action--edit rpbdd-btn-sm--dense';
+          editBtn.innerHTML = '✎ Edit';
+          editBtn.style.fontSize = '0.64rem';
+          editBtn.style.padding = '0.1rem 0.35rem';
+          editBtn.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            openBirthdayOptionModal('position', 'edit', o.value);
+          });
+          row.appendChild(editBtn);
+          var removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.className = 'rpbdd-btn-sm rpbdd-btn-action--delete rpbdd-btn-sm--dense';
+          removeBtn.style.fontSize = '0.64rem';
+          removeBtn.style.padding = '0.1rem 0.35rem';
+          removeBtn.innerHTML = '🗑 Remove';
+          removeBtn.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            openRpbddConfirm({
+              variant: 'remove',
+              title: 'Remove position option?',
+              message: '“' + o.value + '” will be removed from Position choices.',
+              confirmLabel: 'Remove',
+              cancelLabel: 'Cancel',
+              danger: true,
+            }).then(function (ok) {
+              if (!ok) return;
+              removeBirthdayOptionValue('position', o.value);
+              var base = getBirthdaysApiBase();
+              if (base) {
+                fetch(base + '/options/delete', {
+                  method: 'POST',
+                  credentials: 'same-origin',
+                  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ kind: 'position', value: o.value }),
+                }).catch(function () {});
+              }
+              renderBirthdaySelectOptions();
+            });
+          });
+          row.appendChild(removeBtn);
+          posList.appendChild(row);
         });
       }
       setBirthdayDropdownValue('position', selectedPos);
@@ -3679,18 +3829,69 @@
         secList.innerHTML = '';
         Array.prototype.slice.call(secEl.options).forEach(function (o) {
           if (!o.value) return;
+          var row = document.createElement('div');
+          row.className = 'rpbdd-bday-dd-row';
+          row.style.display = 'flex';
+          row.style.alignItems = 'center';
+          row.style.gap = '0.35rem';
           var btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'rpbdd-btn-sm rpbdd-bday-dd-option' + (o.value === selectedSec ? ' is-selected' : '');
           btn.style.textAlign = 'left';
           btn.style.justifyContent = 'flex-start';
-          btn.style.width = '100%';
+          btn.style.flex = '1 1 auto';
+          btn.style.minWidth = '0';
           btn.textContent = o.textContent;
           btn.addEventListener('click', function () {
             setBirthdayDropdownValue('section', o.value);
             closeBirthdayDropdownMenus();
           });
-          secList.appendChild(btn);
+          row.appendChild(btn);
+          var editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.className = 'rpbdd-btn-sm rpbdd-btn-action--edit rpbdd-btn-sm--dense';
+          editBtn.innerHTML = '✎ Edit';
+          editBtn.style.fontSize = '0.64rem';
+          editBtn.style.padding = '0.1rem 0.35rem';
+          editBtn.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            openBirthdayOptionModal('section', 'edit', o.value);
+          });
+          row.appendChild(editBtn);
+          var removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.className = 'rpbdd-btn-sm rpbdd-btn-action--delete rpbdd-btn-sm--dense';
+          removeBtn.style.fontSize = '0.64rem';
+          removeBtn.style.padding = '0.1rem 0.35rem';
+          removeBtn.innerHTML = '🗑 Remove';
+          removeBtn.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            openRpbddConfirm({
+              variant: 'remove',
+              title: 'Remove section option?',
+              message: '“' + o.value + '” will be removed from Section choices.',
+              confirmLabel: 'Remove',
+              cancelLabel: 'Cancel',
+              danger: true,
+            }).then(function (ok) {
+              if (!ok) return;
+              removeBirthdayOptionValue('section', o.value);
+              var base = getBirthdaysApiBase();
+              if (base) {
+                fetch(base + '/options/delete', {
+                  method: 'POST',
+                  credentials: 'same-origin',
+                  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ kind: 'section', value: o.value }),
+                }).catch(function () {});
+              }
+              renderBirthdaySelectOptions();
+            });
+          });
+          row.appendChild(removeBtn);
+          secList.appendChild(row);
         });
       }
       setBirthdayDropdownValue('section', selectedSec);
@@ -13425,6 +13626,7 @@
       state.birthdaySections =
         Array.isArray(rawBirthdaySec) && rawBirthdaySec.length ? rawBirthdaySec : defaultBirthdaySectionsFromLegend();
       renderBirthdaySelectOptions();
+      refreshBirthdayOptionsFromApi().catch(function () {});
       openModal('modal-add-birthday');
     });
     document.getElementById('birthday-position-trigger')?.addEventListener('click', function () {
@@ -13453,21 +13655,65 @@
     document.getElementById('rpbdd-save-birthday-option')?.addEventListener('click', function () {
       var kindEl = document.getElementById('rpbdd-birthday-option-kind');
       var valueEl = document.getElementById('rpbdd-birthday-option-value');
+      var saveBtn = document.getElementById('rpbdd-save-birthday-option');
       var kind = String((kindEl && kindEl.value) || '').trim().toLowerCase() === 'section' ? 'section' : 'position';
       var val = String((valueEl && valueEl.value) || '').trim();
+      var mode = String((saveBtn && saveBtn.dataset && saveBtn.dataset.mode) || 'add').trim().toLowerCase();
+      var oldVal = String((saveBtn && saveBtn.dataset && saveBtn.dataset.oldValue) || '').trim();
       if (!val) {
         rpbddAlertMessage('Please enter a value');
         return;
       }
-      if (kind === 'position') {
-        if (!state.birthdayPositions.some(function (x) { return String(x).toLowerCase() === val.toLowerCase(); })) {
-          state.birthdayPositions.push(val);
-          saveBirthdayDropdowns();
+      if (mode === 'edit' && oldVal) {
+        if (birthdayOptionExists(kind, val, oldVal)) {
+          rpbddAlertMessage('That value already exists.');
+          return;
+        }
+        if (!updateBirthdayOptionValue(kind, oldVal, val)) {
+          rpbddAlertMessage('Could not update option.');
+          return;
+        }
+        var baseUpd = getBirthdaysApiBase();
+        if (baseUpd) {
+          fetch(baseUpd + '/options/update', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kind: kind, old_value: oldVal, value: val }),
+          })
+            .then(parseEventsApiResponse)
+            .then(function (parsed) {
+              var j = parsed.data;
+              if (!j || !j.ok) rpbddAlertMessage(formatEventsApiError(parsed));
+            })
+            .catch(function () {
+              rpbddAlertMessage('Network error — could not update option on server');
+            });
         }
       } else {
-        if (!state.birthdaySections.some(function (x) { return String(x).toLowerCase() === val.toLowerCase(); })) {
-          state.birthdaySections.push(val);
-          saveBirthdayDropdowns();
+        if (birthdayOptionExists(kind, val, '')) {
+          rpbddAlertMessage('That value already exists.');
+          return;
+        }
+        if (kind === 'position') state.birthdayPositions.push(val);
+        else state.birthdaySections.push(val);
+        saveBirthdayDropdowns();
+        var baseAdd = getBirthdaysApiBase();
+        if (baseAdd) {
+          fetch(baseAdd + '/options', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kind: kind, value: val }),
+          })
+            .then(parseEventsApiResponse)
+            .then(function (parsed) {
+              var j = parsed.data;
+              if (!j || !j.ok) rpbddAlertMessage(formatEventsApiError(parsed));
+            })
+            .catch(function () {
+              rpbddAlertMessage('Network error — could not save option on server');
+            });
         }
       }
       renderBirthdaySelectOptions();
