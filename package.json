@@ -9,7 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "preview:lan": "vite preview --host",
-    "db:push": "supabase db push --linked"
+    "db:push": "supabase db push --linked",
+    "admin:reset-default-login": "node scripts/reset-admin-default-login.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",
