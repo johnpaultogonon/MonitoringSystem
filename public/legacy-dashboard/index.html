@@ -119,13 +119,10 @@
                 <!-- Events search moved into Events panel toolbar area -->
             </div>
             <div class="rpbdd-main-header-trailing">
-                <label class="rpbdd-theme-picker">
+                <div class="rpbdd-theme-picker">
                     <span class="rpbdd-theme-picker__text">Theme</span>
-                    <select id="rpbdd-theme-select" class="rpbdd-theme-select" title="Dashboard color theme" aria-label="Dashboard color theme">
-                        <option value="light">Light</option>
-                        <option value="night">Night sky</option>
-                    </select>
-                </label>
+                    <button type="button" id="rpbdd-theme-toggle" class="rpbdd-theme-toggle" aria-label="Toggle dashboard theme">Light</button>
+                </div>
                 <div class="rpbdd-main-header-trailing--branding" aria-label="Government branding">
                 <img
                     src="./assets/images/branding/dar-northern-mindanao-seal.png"
@@ -274,7 +271,7 @@
 
         <footer class="rpbdd-footer-bar">
             <div class="rpbdd-footer-email">
-                <a href="mailto:rpbdd2021arbdsp@gmail.com">rpbdd2021arbdsp@gmail.com</a>
+                Department of Agrarian Reform Regional Office X | Records Performance and Beneficiaries Development Division | All rights reserved 2026
             </div>
         </footer>
     </div>
@@ -711,7 +708,7 @@
                 <div id="rpbdd-date-rows" class="rpbdd-date-rows" role="group" aria-labelledby="rpbdd-add-dates-label"></div>
             </div>
             <div class="rpbdd-form-row">
-                <label class="rpbdd-label" for="add-time">Time</label>
+                <label class="rpbdd-label" for="add-time">Time <span class="rpbdd-label-optional">(optional)</span></label>
                 <input class="rpbdd-input rpbdd-input--simple" id="add-time" name="time" type="time">
             </div>
             <div class="rpbdd-form-row">
@@ -767,7 +764,7 @@
                 <input class="rpbdd-input rpbdd-input--simple" id="edit-location" name="edit_location" type="text" autocomplete="off">
             </div>
             <div class="rpbdd-form-row">
-                <label class="rpbdd-label" for="edit-time">Time</label>
+                <label class="rpbdd-label" for="edit-time">Time <span class="rpbdd-label-optional">(optional)</span></label>
                 <input class="rpbdd-input rpbdd-input--simple" id="edit-time" name="edit_time" type="time">
             </div>
             <div class="rpbdd-form-row">
@@ -915,10 +912,6 @@
                     </div>
                     <span id="rpbdd-category-preview-badge" style="font-size:0.68rem;font-weight:600;padding:0.12rem 0.42rem;border-radius:999px;border:1px solid #3B82F6;color:#3B82F6;background:color-mix(in srgb, #3B82F6 14%, transparent)">Sample event</span>
                 </div>
-            </div>
-            <div class="rpbdd-form-row" id="rpbdd-category-editor-remove-wrap" hidden>
-                <label class="rpbdd-label" for="rpbdd-category-remove-select">Select category</label>
-                <select class="rpbdd-select" id="rpbdd-category-remove-select"></select>
             </div>
             <div class="rpbdd-form-row" id="rpbdd-category-editor-edit-wrap" hidden>
                 <label class="rpbdd-label" for="rpbdd-category-edit-select">Select category</label>

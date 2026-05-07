@@ -1035,6 +1035,11 @@ body.rpbdd-body {
   gap: 1rem;
 }
 
+.rpbdd-label-optional {
+  font-weight: 500;
+  opacity: 0.72;
+}
+
 .rpbdd-theme-picker {
   display: flex;
   align-items: center;
@@ -1066,7 +1071,7 @@ body.rpbdd-body {
   }
 }
 
-.rpbdd-theme-select {
+.rpbdd-theme-toggle {
   appearance: none;
   -webkit-appearance: none;
   font: inherit;
@@ -1076,22 +1081,19 @@ body.rpbdd-body {
   background: var(--rp-surface, #fff);
   border: 1px solid var(--rp-border, #e2e8f0);
   border-radius: 0.5rem;
-  padding: 0.38rem 1.85rem 0.38rem 0.55rem;
+  padding: 0.38rem 0.65rem;
   cursor: pointer;
   min-width: 7.5rem;
   max-width: min(11rem, 38vw);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.45rem center;
-  background-size: 0.75rem;
+  text-align: center;
 }
 
-.rpbdd-theme-select:hover {
+.rpbdd-theme-toggle:hover {
   border-color: var(--rpbdd-cal-mid, #15803d);
 }
 
-.rpbdd-theme-select:focus-visible {
+.rpbdd-theme-toggle:focus-visible {
   outline: 2px solid var(--rpbdd-cal-mid, #15803d);
   outline-offset: 2px;
 }
@@ -1921,7 +1923,7 @@ html[data-rpbdd-theme="light"] body.rpbdd-body {
   background: linear-gradient(180deg, #ecfdf5 0%, #e8f5eb 42%, #dcfce7 100%);
 }
 
-html[data-rpbdd-theme="light"] .rpbdd-theme-select {
+html[data-rpbdd-theme="light"] .rpbdd-theme-toggle {
   border: 1px solid #2f6b44;
   background: #ffffff;
   color: var(--rp-text);
@@ -6754,6 +6756,9 @@ html[data-rpbdd-density="compact"] .rpbdd-modal-foot {
   text-align: center;
   font-size: 0.72rem;
   color: var(--rp-muted);
+  max-width: min(72rem, 100%);
+  line-height: 1.35;
+  padding: 0 0.5rem;
 }
 
 .rpbdd-footer-email a {
@@ -9469,18 +9474,17 @@ html[data-rpbdd-theme="night"] .rpbdd-theme-picker__text {
   text-shadow: 0 1px 2px rgba(2, 8, 24, 0.75);
 }
 
-html[data-rpbdd-theme="night"] .rpbdd-theme-select {
+html[data-rpbdd-theme="night"] .rpbdd-theme-toggle {
   background-color: transparent !important;
   background: transparent !important;
   border-color: var(--rp-border-strong);
   color: #f0f8ff;
   box-shadow: inset 0 1px 0 rgba(176, 220, 255, 0.14);
   text-shadow: 0 1px 2px rgba(2, 8, 24, 0.75);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2370b8ff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 
-/* Keep theme selector more transparent than generic night select background. */
-html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-select {
+/* Keep theme control more transparent than generic night UI background. */
+html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-toggle {
   background: transparent !important;
   background-color: transparent !important;
   border-color: rgba(112, 184, 255, 0.38) !important;
@@ -9490,22 +9494,15 @@ html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-select {
   -webkit-backdrop-filter: blur(8px) saturate(1.1);
 }
 
-html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-select:hover,
-html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-select:focus,
-html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-select:focus-visible {
+html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-toggle:hover,
+html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-toggle:focus,
+html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-toggle:focus-visible {
   background: transparent !important;
   background-color: transparent !important;
 }
 
-/* Night Sky: style native select popup rows to avoid white menu. */
-html[data-rpbdd-theme="night"] #rpbdd-theme-select option,
-html[data-rpbdd-theme="night"] #rpbdd-theme-select optgroup {
-  background-color: #061a3f;
-  color: #f3f9ff;
-}
-
-/* Night Sky only: Theme dropdown matches Add New Event category dropdown transparency exactly. */
-html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-select,
+/* Night Sky only: Theme toggle matches Add New Event category dropdown transparency exactly. */
+html[data-rpbdd-theme="night"] .rpbdd-app .rpbdd-theme-toggle,
 html[data-rpbdd-theme="night"] #modal-add-event #rpbdd-category-dropdown-trigger {
   background: transparent !important;
   background-color: transparent !important;
@@ -11127,11 +11124,11 @@ html[data-rpbdd-theme="winter"] .rpbdd-theme-picker__text {
   color: color-mix(in srgb, var(--rpbdd-header-title) 28%, #0f172a 72%);
 }
 
-html[data-rpbdd-theme="rainy"] .rpbdd-theme-select,
-html[data-rpbdd-theme="spring"] .rpbdd-theme-select,
-html[data-rpbdd-theme="summer"] .rpbdd-theme-select,
-html[data-rpbdd-theme="autumn"] .rpbdd-theme-select,
-html[data-rpbdd-theme="winter"] .rpbdd-theme-select {
+html[data-rpbdd-theme="rainy"] .rpbdd-theme-toggle,
+html[data-rpbdd-theme="spring"] .rpbdd-theme-toggle,
+html[data-rpbdd-theme="summer"] .rpbdd-theme-toggle,
+html[data-rpbdd-theme="autumn"] .rpbdd-theme-toggle,
+html[data-rpbdd-theme="winter"] .rpbdd-theme-toggle {
   color: color-mix(in srgb, var(--rp-text) 90%, #0f172a 10%);
   font-weight: 700;
   border-color: color-mix(in srgb, var(--rp-border) 55%, #94a3b8 45%);
@@ -13301,7 +13298,7 @@ html[data-rpbdd-theme="rainy"] {
 
 html[data-rpbdd-theme="rainy"] .rpbdd-main-header h1,
 html[data-rpbdd-theme="rainy"] .rpbdd-theme-picker__text,
-html[data-rpbdd-theme="rainy"] .rpbdd-theme-select,
+html[data-rpbdd-theme="rainy"] .rpbdd-theme-toggle,
 html[data-rpbdd-theme="rainy"] .rpbdd-widget-head h3,
 html[data-rpbdd-theme="rainy"] .rpbdd-cal-title,
 html[data-rpbdd-theme="rainy"] .rpbdd-modal-head h2,

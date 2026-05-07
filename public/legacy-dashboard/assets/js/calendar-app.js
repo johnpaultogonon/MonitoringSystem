@@ -719,9 +719,16 @@
   }
 
   function syncThemePickerUi() {
-    var sel = document.getElementById('rpbdd-theme-select');
+    var btn = document.getElementById('rpbdd-theme-toggle');
     var t = normalizeDashboardTheme(document.documentElement.getAttribute('data-rpbdd-theme'));
-    if (sel) sel.value = t;
+    if (!btn) return;
+    btn.textContent = t === 'night' ? 'Night sky' : 'Light';
+    btn.setAttribute(
+      'aria-label',
+      t === 'night' ? 'Theme: Night sky. Click to switch to Light.' : 'Theme: Light. Click to switch to Night sky.',
+    );
+    btn.title = t === 'night' ? 'Switch to Light theme' : 'Switch to Night sky theme';
+    btn.setAttribute('aria-pressed', t === 'night' ? 'true' : 'false');
   }
 
   function normalizeDashboardDensity(raw) {
@@ -2363,6 +2370,25 @@
     saveEventCategories();
   }
 
+  function confirmRemoveCategory(categoryName) {
+    var key = canonicalCategoryKey(categoryName);
+    if (!key) return;
+    openRpbddConfirm({
+      variant: 'remove',
+      title: 'Remove category?',
+      message: '“' + key + '” will be removed from dropdown and legends.',
+      confirmLabel: 'Remove',
+      cancelLabel: 'Cancel',
+      danger: true,
+    }).then(function (ok) {
+      if (!ok) return;
+      removeCategory(key);
+      renderCategoryDropdowns('', '');
+      renderCategoryLegend();
+      if (state.activeNav === 'reports') renderReportsPanel();
+    });
+  }
+
   function updateCategoryColor(name, color) {
     var key = canonicalCategoryKey(name);
     if (!key) return false;
@@ -2580,8 +2606,7 @@
       removeBtn.innerHTML = '🗑 Remove';
       removeBtn.title = 'Remove ' + cat.name;
       removeBtn.addEventListener('click', function () {
-        var addSelect = document.getElementById('add-category');
-        openCategoryEditor('remove', addSelect || null, cat.name);
+        confirmRemoveCategory(cat.name);
       });
       right.appendChild(editBtn);
       right.appendChild(removeBtn);
@@ -2658,8 +2683,7 @@
       removeBtn.innerHTML = '🗑 Remove';
       removeBtn.title = 'Remove ' + cat.name;
       removeBtn.addEventListener('click', function () {
-        var editSelect = document.getElementById('edit-category');
-        openCategoryEditor('remove', editSelect || null, cat.name);
+        confirmRemoveCategory(cat.name);
       });
       right.appendChild(editBtn);
       right.appendChild(removeBtn);
@@ -2676,21 +2700,6 @@
       openCategoryEditor('add', editSelect || null, '');
     });
     wrap.appendChild(addBtn);
-  }
-
-  function renderCategoryRemovalOptions(selectedName) {
-    var sel = document.getElementById('rpbdd-category-remove-select');
-    if (!sel) return;
-    var selected = canonicalCategoryKey(selectedName || sel.value);
-    sel.innerHTML = '';
-    sortEventCategoriesDisplayOrder(eventCategories).forEach(function (cat) {
-      if (!cat || !cat.name) return;
-      var opt = document.createElement('option');
-      opt.value = cat.name;
-      opt.textContent = cat.name;
-      if (cat.name === selected) opt.selected = true;
-      sel.appendChild(opt);
-    });
   }
 
   function renderCategoryEditOptions(selectedName) {
@@ -2850,20 +2859,18 @@
     var titleEl = document.getElementById('rpbdd-category-editor-title');
     var hintEl = document.getElementById('rpbdd-category-editor-hint');
     var addWrap = document.getElementById('rpbdd-category-editor-add-wrap');
-    var removeWrap = document.getElementById('rpbdd-category-editor-remove-wrap');
     var editWrap = document.getElementById('rpbdd-category-editor-edit-wrap');
     var inputEl = document.getElementById('rpbdd-category-editor-input');
     var colorEl = document.getElementById('rpbdd-category-editor-color');
     var saveBtn = document.getElementById('rpbdd-category-editor-save');
-    if (!titleEl || !hintEl || !addWrap || !removeWrap || !editWrap || !saveBtn) return;
-    var m = mode === 'remove' || mode === 'edit' ? mode : 'add';
+    if (!titleEl || !hintEl || !addWrap || !editWrap || !saveBtn) return;
+    var m = mode === 'edit' ? 'edit' : 'add';
     saveBtn.dataset.mode = m;
     saveBtn.dataset.returnCategory = addSelect && addSelect.dataset ? addSelect.dataset.lastCategory || '' : '';
     if (m === 'add') {
       titleEl.textContent = 'Add Category';
       hintEl.textContent = 'Create a new category for event dropdown and legends.';
       addWrap.hidden = false;
-      removeWrap.hidden = true;
       editWrap.hidden = true;
       if (inputEl) {
         inputEl.value = '';
@@ -2878,33 +2885,18 @@
           }
         }, 0);
       }
-    } else if (m === 'edit') {
+    } else {
       titleEl.textContent = 'Edit Category Color';
       hintEl.textContent = 'Choose a category and assign a new unique color.';
       addWrap.hidden = true;
-      removeWrap.hidden = true;
       editWrap.hidden = false;
       renderCategoryEditOptions(selectedName || (addSelect && addSelect.dataset ? addSelect.dataset.lastCategory : ''));
       updateCategoryEditPreview();
-    } else {
-      titleEl.textContent = 'Remove Category';
-      hintEl.textContent = 'Select a category to remove from dropdown and legends.';
-      addWrap.hidden = true;
-      removeWrap.hidden = false;
-      editWrap.hidden = true;
-      renderCategoryRemovalOptions(selectedName || (addSelect && addSelect.dataset ? addSelect.dataset.lastCategory : ''));
     }
-    if (m === 'remove') {
-      saveBtn.textContent = 'Remove';
-      saveBtn.setAttribute('aria-label', 'Remove category');
-      saveBtn.classList.remove('rpbdd-btn-sm--green');
-      saveBtn.classList.add('rpbdd-btn-sm--danger');
-    } else {
-      saveBtn.textContent = 'Save';
-      saveBtn.setAttribute('aria-label', m === 'edit' ? 'Save color' : 'Save category');
-      saveBtn.classList.remove('rpbdd-btn-sm--danger');
-      saveBtn.classList.add('rpbdd-btn-sm--green');
-    }
+    saveBtn.textContent = 'Save';
+    saveBtn.setAttribute('aria-label', m === 'edit' ? 'Save color' : 'Save category');
+    saveBtn.classList.remove('rpbdd-btn-sm--danger');
+    saveBtn.classList.add('rpbdd-btn-sm--green');
     openModal('modal-category-editor');
   }
 
@@ -2913,30 +2905,6 @@
     if (!saveBtn) return;
     var mode = saveBtn.dataset.mode || 'add';
     var returnCategory = saveBtn.dataset.returnCategory || '';
-    if (mode === 'remove') {
-      var remSel = document.getElementById('rpbdd-category-remove-select');
-      var key = canonicalCategoryKey(remSel && remSel.value);
-      if (!key) {
-        rpbddAlertMessage('No categories to remove');
-        return;
-      }
-      openRpbddConfirm({
-        variant: 'remove',
-        title: 'Remove category?',
-        message: '“' + key + '” will be removed from dropdown and legends.',
-        confirmLabel: 'Remove',
-        cancelLabel: 'Cancel',
-        danger: true,
-      }).then(function (ok) {
-        if (!ok) return;
-        removeCategory(key);
-        renderCategoryDropdowns('', '');
-        renderCategoryLegend();
-        if (state.activeNav === 'reports') renderReportsPanel();
-        closeModal('modal-category-editor');
-      });
-      return;
-    }
     if (mode === 'edit') {
       var editSel = document.getElementById('rpbdd-category-edit-select');
       var editColorEl = document.getElementById('rpbdd-category-edit-color');
@@ -13510,8 +13478,9 @@
     bindTeamCustomDropdowns();
     bindMemberCustomDropdowns();
 
-    document.getElementById('rpbdd-theme-select')?.addEventListener('change', function () {
-      applyTheme(this.value, { persistShared: true });
+    document.getElementById('rpbdd-theme-toggle')?.addEventListener('click', function () {
+      var cur = normalizeDashboardTheme(document.documentElement.getAttribute('data-rpbdd-theme'));
+      applyTheme(cur === 'light' ? 'night' : 'light', { persistShared: true });
     });
 
     document.getElementById('rpbdd-sidebar-toggle')?.addEventListener('click', function () {
@@ -13929,15 +13898,15 @@
     document.getElementById('rpbdd-save-add-event')?.addEventListener('click', function () {
       var title = document.getElementById('add-title').value.trim();
       var cat = canonicalCategoryKey(document.getElementById('add-category').value);
-      var timeRaw = document.getElementById('add-time').value;
+      var timeRaw = String(document.getElementById('add-time').value || '').trim();
       var desc = document.getElementById('add-description').value.trim();
       var loc = document.getElementById('add-location').value.trim();
       var dates = collectAddEventDatesFromDom();
       if (dates.length === 0) {
         dates = state.eventDates.filter(function (d) { return d; });
       }
-      if (!title || !cat || !timeRaw || dates.length === 0) {
-        rpbddAlertMessage('Please fill Event Title, at least one Date, Time, and Category');
+      if (!title || !cat || dates.length === 0) {
+        rpbddAlertMessage('Please fill Event Title, at least one Date, and Category');
         return;
       }
       var inputByEl = document.getElementById('add-input-by');
@@ -14011,7 +13980,7 @@
       if (!state.editingEvent) return;
       var title = document.getElementById('edit-title').value.trim();
       var cat = canonicalCategoryKey(document.getElementById('edit-category').value);
-      var timeRaw = document.getElementById('edit-time').value;
+      var timeRaw = String(document.getElementById('edit-time').value || '').trim();
       var datesFromDom = collectEditEventDatesFromDom();
       if (datesFromDom.length === 0) {
         datesFromDom = state.editEventDates.filter(function (d) {
@@ -14019,8 +13988,8 @@
         });
       }
       var datesNorm = normalizeDedupeSortDatesArray(datesFromDom);
-      if (!title || !cat || !timeRaw || datesNorm.length === 0) {
-        rpbddAlertMessage('Please fill title, category, time, and at least one date');
+      if (!title || !cat || datesNorm.length === 0) {
+        rpbddAlertMessage('Please fill title, category, and at least one date');
         return;
       }
       var timeDisp = formatTimeTo12Hour(timeRaw);
